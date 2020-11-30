@@ -18,4 +18,4 @@ rules:
   semi:
     - error
     - always
-  no-console: off
+  no-console: 0
