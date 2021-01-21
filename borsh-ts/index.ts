@@ -21,6 +21,11 @@ const INITIAL_LENGTH = 1024;
 
 export type Schema = Map<Function, any>;
 
+export interface FieldMapper {
+    encode: Function
+    decode: Function
+}
+
 export class BorshError extends Error {
     originalMessage: string;
     fieldPath: string[] = [];
@@ -212,7 +217,11 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function serializeField(schema: Schema, fieldName: string, value: any, fieldType: any, writer: any) {
+function serializeField(schema: Schema, fieldName: string, value: any, fieldType: any, fieldMapper: FieldMapper | undefined, writer: any) {
+    if (value != null && fieldMapper) {
+        value = fieldMapper.encode(value)
+    }
+
     try {
         // TODO: Handle missing values properly (make sure they never result in just skipped write)
         if (typeof fieldType === 'string') {
@@ -229,7 +238,7 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
                 if (typeof fieldType[1] === 'number') {
                     len = fieldType[1]
                 }
-                writer.writeArray(value, (item: any) => { serializeField(schema, fieldName, item, fieldType[0], writer); }, len);
+                writer.writeArray(value, (item: any) => { serializeField(schema, fieldName, item, fieldType[0], undefined, writer); }, len);
             }
         } else if (fieldType.kind !== undefined) {
             switch (fieldType.kind) {
@@ -238,7 +247,7 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
                     writer.writeU8(0);
                 } else {
                     writer.writeU8(1);
-                    serializeField(schema, fieldName, value, fieldType.type, writer);
+                    serializeField(schema, fieldName, value, fieldType.type, undefined, writer);
                 }
                 break;
             }
@@ -261,16 +270,16 @@ function serializeStruct(schema: Schema, obj: any, writer: any) {
         throw new BorshError(`Class ${obj.constructor.name} is missing in schema`);
     }
     if (structSchema.kind === 'struct') {
-        structSchema.fields.map(([fieldName, fieldType]: [any, any]) => {
-            serializeField(schema, fieldName, obj[fieldName], fieldType, writer);
+        structSchema.fields.map(([fieldName, fieldType, fieldMapper]: [any, any, FieldMapper]) => {
+            serializeField(schema, fieldName, obj[fieldName], fieldType, fieldMapper, writer);
         });
     } else if (structSchema.kind === 'enum') {
         const name = obj[structSchema.field];
         for (let idx = 0; idx < structSchema.values.length; ++idx) {
-            const [fieldName, fieldType]: [any, any] = structSchema.values[idx];
+            const [fieldName, fieldType, fieldMapper]: [any, any, FieldMapper] = structSchema.values[idx];
             if (fieldName === name) {
                 writer.writeU8(idx);
-                serializeField(schema, fieldName, obj[fieldName], fieldType, writer);
+                serializeField(schema, fieldName, obj[fieldName], fieldType, fieldMapper, writer);
                 break;
             }
         }
@@ -287,25 +296,34 @@ export function serialize(schema: Schema, obj: any): Uint8Array {
     return writer.toArray();
 }
 
-function deserializeField(schema: Schema, fieldName: string, fieldType: any, reader: BinaryReader): any {
+function deserializeField(schema: Schema, fieldName: string, fieldType: any, fieldMapper: FieldMapper | undefined, reader: BinaryReader): any {
+    let result
+
     try {
         if (typeof fieldType === 'string') {
-            return reader[`read${capitalizeFirstLetter(fieldType)}`]();
-        }
-
-        if (fieldType instanceof Array) {
+            result = reader[`read${capitalizeFirstLetter(fieldType)}`]();
+        } else if (fieldType instanceof Array) {
             if (typeof fieldType[0] === 'number') {
-                return reader.readFixedArray(fieldType[0]);
-            }
+                result = reader.readFixedArray(fieldType[0]);
+            } else {
+                let len = null
+                if (typeof fieldType[1] === 'number') {
+                    len = fieldType[1]
+                }
 
-            let len = null
-            if (typeof fieldType[1] === 'number') {
-                len = fieldType[1]
+                // FIXME: support field mapper
+                // if 1, 2 === 'object', it's a field mapper
+                result = reader.readArray(() => deserializeField(schema, fieldName, fieldType[0], undefined, reader), len);
             }
-            return reader.readArray(() => deserializeField(schema, fieldName, fieldType[0], reader), len);
+        } else {
+            result = deserializeStruct(schema, fieldType, reader);
         }
 
-        return deserializeStruct(schema, fieldType, reader);
+        if (typeof fieldMapper === 'object') {
+            return fieldMapper.decode(result)
+        } else {
+            return result
+        }
     } catch (error) {
         if (error instanceof BorshError) {
             error.addToFieldPath(fieldName);
@@ -322,8 +340,8 @@ function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader)
 
     if (structSchema.kind === 'struct') {
         const result = {};
-        for (const [fieldName, fieldType] of schema.get(classType).fields) {
-            result[fieldName] = deserializeField(schema, fieldName, fieldType, reader);
+        for (const [fieldName, fieldType, fieldMapper] of schema.get(classType).fields) {
+            result[fieldName] = deserializeField(schema, fieldName, fieldType, fieldMapper, reader);
         }
         return new classType(result);
     }
@@ -333,8 +351,8 @@ function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader)
         if (idx >= structSchema.values.length) {
             throw new BorshError(`Enum index: ${idx} is out of range`);
         }
-        const [fieldName, fieldType] = structSchema.values[idx];
-        const fieldValue = deserializeField(schema, fieldName, fieldType, reader);
+        const [fieldName, fieldType, fieldMapper] = structSchema.values[idx];
+        const fieldValue = deserializeField(schema, fieldName, fieldType, fieldMapper, reader);
         return new classType({ [fieldName]: fieldValue });
     }
 
