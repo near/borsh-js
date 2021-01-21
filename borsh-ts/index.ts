@@ -92,12 +92,22 @@ export class BinaryWriter {
         this.writeBuffer(Buffer.from(array));
     }
 
-    public writeArray(array: any[], fn: any) {
+    public writeArray(array: any[], fn: any, len?: number) {
         this.maybeResize();
-        this.writeU32(array.length);
+
+        if (len == null) {
+            this.writeU32(array.length);
+        }
+
+        let i = len || array.length
         for (const elem of array) {
             this.maybeResize();
             fn(elem);
+            i--
+        }
+
+        if (i !== 0) {
+            throw new BorshError(`Expecting a fixed array of {len} elements`)
         }
     }
 
@@ -185,8 +195,11 @@ export class BinaryReader {
     }
 
     @handlingRangeError
-    readArray(fn: any): any[] {
-        const len = this.readU32();
+    readArray(fn: any, len?: number): any[] {
+        if (len == null)  {
+            len = this.readU32();
+        }
+
         const result = Array<any>();
         for (let i = 0; i < len; ++i) {
             result.push(fn());
@@ -212,7 +225,11 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
                 }
                 writer.writeFixedArray(value);
             } else {
-                writer.writeArray(value, (item: any) => { serializeField(schema, fieldName, item, fieldType[0], writer); });
+                let len = null
+                if (typeof fieldType[1] === 'number') {
+                    len = fieldType[1]
+                }
+                writer.writeArray(value, (item: any) => { serializeField(schema, fieldName, item, fieldType[0], writer); }, len);
             }
         } else if (fieldType.kind !== undefined) {
             switch (fieldType.kind) {
@@ -281,7 +298,11 @@ function deserializeField(schema: Schema, fieldName: string, fieldType: any, rea
                 return reader.readFixedArray(fieldType[0]);
             }
 
-            return reader.readArray(() => deserializeField(schema, fieldName, fieldType[0], reader));
+            let len = null
+            if (typeof fieldType[1] === 'number') {
+                len = fieldType[1]
+            }
+            return reader.readArray(() => deserializeField(schema, fieldName, fieldType[0], reader), len);
         }
 
         return deserializeStruct(schema, fieldType, reader);

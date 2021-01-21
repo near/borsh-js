@@ -21,7 +21,7 @@ export declare class BinaryWriter {
     private writeBuffer;
     writeString(str: string): void;
     writeFixedArray(array: Uint8Array): void;
-    writeArray(array: any[], fn: any): void;
+    writeArray(array: any[], fn: any, len?: number): void;
     toArray(): Uint8Array;
 }
 export declare class BinaryReader {
@@ -35,7 +35,7 @@ export declare class BinaryReader {
     private readBuffer;
     readString(): string;
     readFixedArray(len: number): Uint8Array;
-    readArray(fn: any): any[];
+    readArray(fn: any, len?: number): any[];
 }
 export declare function serialize(schema: Schema, obj: any): Uint8Array;
 export declare function deserialize(schema: Schema, classType: any, buffer: Buffer): any;
