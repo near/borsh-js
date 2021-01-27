@@ -12,5 +12,5 @@ branches:
 
 script:
   - fossa init
-  - fossa analyze
+  - fossa analyze --server-scan
   - fossa test
