@@ -2,6 +2,15 @@ language: node_js
 node_js:
   - 12
 
+before_script:
+  - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
+
+
 branches:
   only:
     - master
+
+script:
+  - fossa init
+  - fossa analyze
+  - fossa test
