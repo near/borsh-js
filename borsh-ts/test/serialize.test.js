@@ -1,4 +1,5 @@
 const borsh = require('../../lib/index');
+const BN = require('bn.js');
 
 class Assignable {
     constructor(properties) {
@@ -19,6 +20,40 @@ test('serialize object', async () => {
     expect(newValue.y.toString()).toEqual('20');
     expect(newValue.z).toEqual('123');
     expect(newValue.q).toEqual(new Uint8Array([1, 2, 3]));
+});
+
+test('serialize max uint', async () => {
+    const u64MaxHex = 'ffffffffffffffff';
+    const value = new Test({
+        x: 255,
+        y: 65535,
+        z: 4294967295,
+        q: new BN(u64MaxHex, 16),
+        r: new BN(u64MaxHex.repeat(2), 16),
+        s: new BN(u64MaxHex.repeat(4), 16),
+        t: new BN(u64MaxHex.repeat(8), 16)
+    });
+    const schema = new Map([[Test, {
+        kind: 'struct',
+        fields: [
+            ['x', 'u8'],
+            ['y', 'u16'],
+            ['z', 'u32'],
+            ['q', 'u64'],
+            ['r', 'u128'],
+            ['s', 'u256'],
+            ['t', 'u512']
+        ]
+    }]]);
+    const buf = borsh.serialize(schema, value);
+    const newValue = borsh.deserialize(schema, Test, buf);
+    expect(newValue.x).toEqual(255);
+    expect(newValue.y).toEqual(65535);
+    expect(newValue.z).toEqual(4294967295);
+    expect(newValue.q.toString()).toEqual('18446744073709551615');
+    expect(newValue.r.toString()).toEqual('340282366920938463463374607431768211455');
+    expect(newValue.s.toString()).toEqual('115792089237316195423570985008687907853269984665640564039457584007913129639935');
+    expect(newValue.t.toString()).toEqual('13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095');
 });
 
 test('baseEncode string test', async () => {

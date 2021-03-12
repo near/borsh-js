@@ -59,6 +59,12 @@ export class BinaryWriter {
         this.length += 1;
     }
 
+    public writeU16(value: number) {
+        this.maybeResize();
+        this.buf.writeUInt16LE(value, this.length);
+        this.length += 2;
+    }
+
     public writeU32(value: number) {
         this.maybeResize();
         this.buf.writeUInt32LE(value, this.length);
@@ -73,6 +79,16 @@ export class BinaryWriter {
     public writeU128(value: BN) {
         this.maybeResize();
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 16)));
+    }
+
+    public writeU256(value: BN) {
+        this.maybeResize();
+        this.writeBuffer(Buffer.from(new BN(value).toArray('le', 32)));
+    }
+
+    public writeU512(value: BN) {
+        this.maybeResize();
+        this.writeBuffer(Buffer.from(new BN(value).toArray('le', 64)));
     }
 
     private writeBuffer(buffer: Buffer) {
@@ -140,6 +156,13 @@ export class BinaryReader {
     }
 
     @handlingRangeError
+    readU16(): number {
+        const value = this.buf.readUInt16LE(this.offset);
+        this.offset += 2;
+        return value;
+    }
+
+    @handlingRangeError
     readU32(): number {
         const value = this.buf.readUInt32LE(this.offset);
         this.offset += 4;
@@ -155,6 +178,18 @@ export class BinaryReader {
     @handlingRangeError
     readU128(): BN {
         const buf = this.readBuffer(16);
+        return new BN(buf, 'le');
+    }
+
+    @handlingRangeError
+    readU256(): BN {
+        const buf = this.readBuffer(32);
+        return new BN(buf, 'le');
+    }
+
+    @handlingRangeError
+    readU512(): BN {
+        const buf = this.readBuffer(64);
         return new BN(buf, 'le');
     }
 
