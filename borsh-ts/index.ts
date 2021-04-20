@@ -364,3 +364,9 @@ export function deserialize(schema: Schema, classType: any, buffer: Buffer): any
     }
     return result;
 }
+
+/// Deserializes object from bytes using schema, without checking the length read
+export function deserializeUnchecked(schema: Schema, classType: any, buffer: Buffer): any {
+    const reader = new BinaryReader(buffer);
+    return deserializeStruct(schema, classType, reader);
+}
