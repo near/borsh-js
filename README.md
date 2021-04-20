@@ -14,16 +14,96 @@ Borsh stands for _Binary Object Representation Serializer for Hashing_. It is me
 safety, speed, and comes with a strict specification.
 
 ## Examples
-### Serializing an object
+
 ```javascript
-const value = new Test({ x: 255, y: 20, z: '123', q: [1, 2, 3] });
-const schema = new Map([[Test, { kind: 'struct', fields: [['x', 'u8'], ['y', 'u64'], ['z', 'string'], ['q', [3]]] }]]);
-const buffer = borsh.serialize(schema, value);
+
+class Foo {
+  constructor(data) {
+    // The deserializer decodes bytes into an object, and pass that as
+    // the only argument to the constructor
+    //
+    // This constructor assign the keys-values to `this`.
+    Object.assign(this, data)
+  }
+}
+
+class Bar {
+  constructor(data) {
+    Object.assign(this, data)
+  }
+}
+
+// The schema is an ES5 Map, passing tuples into its constructor.
+const schema = new Map([
+  // schema for the Foo constructor
+  [Foo,
+    {
+      kind: "struct",
+      fields: [
+        // map to Bar
+        ["bar", Bar],
+
+        // map to dynamic array of bars
+        // ["bars", [Bar]],
+
+        // map to fixed-length array of bars (3)
+        // ["fixedBars", [Bar, 3]],
+
+        // map to UInt8Array if the array type is omitted
+        // ["someBytes", [3]],
+      ],
+    },
+  ],
+
+  // schema for the Bar constructor
+  [Bar,
+    {
+      kind: "struct",
+      fields: [
+        // map to number
+        ["x", "u8"],
+        // map to BN from bn.js
+        ["y", "u64"],
+      ],
+    },
+  ],
+]);
+
+const bar = new Bar({
+  x: 10,
+  y: new BN("1234"),
+})
+
+const foo = new Foo({
+  bar,
+});
+
+// serializes to UInt8Array
+const buffer = borsh.serialize(schema, foo);
+
+// deserializes from a buffer to an instance of Foo
+const newFoo = borsh.deserialize(schema, Foo, buffer);
 ```
 
-### Deserializing an object
-```javascript
-const newValue = borsh.deserialize(schema, Test, buffer);
+If you are using TypeScript, you can annotate the properties of the classes like this:
+
+```ts
+class Foo {
+  public bar!: Bar
+
+  constructor(data) {
+    Object.assign(this, data)
+  }
+}
+
+class Bar {
+  public x!: number
+  public y!: BN
+
+  constructor(data) {
+    Object.assign(this, data)
+  }
+}
 ```
 
 ## Type Mappings
