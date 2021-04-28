@@ -18,7 +18,7 @@ export declare class BinaryWriter {
     writeU16(value: number): void;
     writeU32(value: number): void;
     writeU64(value: number | BN): void;
-    writeU128(value: number | BN): void;
+    writeU128(value: BN): void;
     writeU256(value: BN): void;
     writeU512(value: BN): void;
     private writeBuffer;
