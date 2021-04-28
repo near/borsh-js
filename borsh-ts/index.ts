@@ -76,17 +76,17 @@ export class BinaryWriter {
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 8)));
     }
 
-    public writeU128(value: BN) {
+    public writeU128(value: number | BN) {
         this.maybeResize();
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 16)));
     }
 
-    public writeU256(value: BN) {
+    public writeU256(value: number | BN) {
         this.maybeResize();
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 32)));
     }
 
-    public writeU512(value: BN) {
+    public writeU512(value: number | BN) {
         this.maybeResize();
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 64)));
     }
