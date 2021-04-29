@@ -45,3 +45,4 @@ export declare class BinaryReader {
 }
 export declare function serialize(schema: Schema, obj: any): Uint8Array;
 export declare function deserialize(schema: Schema, classType: any, buffer: Buffer): any;
+export declare function deserializeUnchecked(schema: Schema, classType: any, buffer: Buffer): any;
