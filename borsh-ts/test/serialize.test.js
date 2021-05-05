@@ -22,6 +22,18 @@ test('serialize object', async () => {
     expect(newValue.q).toEqual(new Uint8Array([1, 2, 3]));
 });
 
+test('serialize optional field', async () => {
+    const schema = new Map([[Test, { kind: 'struct', fields: [['x', { kind: 'option', type: 'string' }]]}]]);
+
+    let buf = borsh.serialize(schema, new Test({ x: '123', }));
+    let newValue = borsh.deserialize(schema, Test, buf);
+    expect(newValue.x).toEqual('123');
+
+    buf = borsh.serialize(schema, new Test({ }));
+    newValue = borsh.deserialize(schema, Test, buf);
+    expect(newValue.x).toEqual(undefined);
+});
+
 test('serialize max uint', async () => {
     const u64MaxHex = 'ffffffffffffffff';
     const value = new Test({

@@ -252,7 +252,7 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
         } else if (fieldType.kind !== undefined) {
             switch (fieldType.kind) {
             case 'option': {
-                if (value === null) {
+                if (value === null || value === undefined) {
                     writer.writeU8(0);
                 } else {
                     writer.writeU8(1);
@@ -317,6 +317,20 @@ function deserializeField(schema: Schema, fieldName: string, fieldType: any, rea
             }
 
             return reader.readArray(() => deserializeField(schema, fieldName, fieldType[0], reader));
+        }
+
+        if (fieldType.kind === 'option') {
+            const option = reader.readU8();
+            if (option) {
+                return deserializeField(
+                    schema,
+                    fieldName,
+                    fieldType.type,
+                    reader
+                );
+            }
+      
+            return undefined;
         }
 
         return deserializeStruct(schema, fieldType, reader);

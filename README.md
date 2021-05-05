@@ -53,7 +53,7 @@ Install dependencies:
 yarn install
 ```
 
-Continuesly build with:
+Continuously build with:
 ```bash
 yarn dev
 ```
