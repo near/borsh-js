@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nearprotocol/borsh.git"
+    "url": "git+https://github.com/near/borsh-js.git"
   },
   "keywords": [
     "serializer",
@@ -28,9 +28,9 @@
   "author": "Near Inc",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/nearprotocol/borsh/issues"
+    "url": "https://github.com/near/borsh-js/issues"
   },
-  "homepage": "https://github.com/nearprotocol/borsh#readme",
+  "homepage": "https://github.com/near/borsh-js#readme",
   "devDependencies": {
     "@types/babel__core": "^7.1.2",
     "@types/babel__template": "^7.0.2",
