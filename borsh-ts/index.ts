@@ -273,7 +273,11 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
     }
 }
 
-function serializeStruct(schema: Schema, obj: any, writer: any) {
+function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
+    if (typeof obj.serialize === 'function') {
+      obj.serialize(writer);
+      return;
+    }
     const structSchema = schema.get(obj.constructor);
     if (!structSchema) {
         throw new BorshError(`Class ${obj.constructor.name} is missing in schema`);
@@ -343,6 +347,10 @@ function deserializeField(schema: Schema, fieldName: string, fieldType: any, rea
 }
 
 function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader) {
+    if (typeof classType.deserialize === 'function') {
+        return classType.deserialize(reader);
+    }
+
     const structSchema = schema.get(classType);
     if (!structSchema) {
         throw new BorshError(`Class ${classType.name} is missing in schema`);

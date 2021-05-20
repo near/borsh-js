@@ -34,6 +34,7 @@
   "devDependencies": {
     "@types/babel__core": "^7.1.2",
     "@types/babel__template": "^7.0.2",
+    "@types/bn.js": "^5.1.0",
     "@types/node": "^12.7.3",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
@@ -45,8 +46,7 @@
     "typescript": "^3.6.2"
   },
   "dependencies": {
-    "@types/bn.js": "^4.11.5",
-    "bn.js": "^5.0.0",
+    "bn.js": "^5.2.0",
     "bs58": "^4.0.0",
     "text-encoding-utf-8": "^1.0.2"
   }
