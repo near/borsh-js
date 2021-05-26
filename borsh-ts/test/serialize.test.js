@@ -11,6 +11,20 @@ class Assignable {
 
 class Test extends Assignable { }
 
+class Serializable {
+    constructor(data) {
+        this.data = data;
+    }
+
+    static borshDeserialize(reader) {
+        return new Serializable(reader.readU8());
+    }
+
+    borshSerialize(writer) {
+        writer.writeU8(this.data);
+    }
+}
+
 test('serialize object', async () => {
     const value = new Test({ x: 255, y: 20, z: '123', q: [1, 2, 3] });
     const schema = new Map([[Test, { kind: 'struct', fields: [['x', 'u8'], ['y', 'u64'], ['z', 'string'], ['q', [3]]] }]]);
@@ -66,6 +80,15 @@ test('serialize max uint', async () => {
     expect(newValue.r.toString()).toEqual('340282366920938463463374607431768211455');
     expect(newValue.s.toString()).toEqual('115792089237316195423570985008687907853269984665640564039457584007913129639935');
     expect(newValue.t.toString()).toEqual('13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095');
+});
+
+test('serialize/deserialize with class methods', () => {
+    const item = new Serializable(10);
+
+    const buf = borsh.serialize(null, item);
+    const newValue = borsh.deserialize(null, Serializable, buf);
+    
+    expect(newValue).toEqual(item);
 });
 
 test('baseEncode string test', async () => {

@@ -274,8 +274,8 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
 }
 
 function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
-    if (typeof obj.serialize === 'function') {
-      obj.serialize(writer);
+    if (typeof obj.borshSerialize === 'function') {
+      obj.borshSerialize(writer);
       return;
     }
     const structSchema = schema.get(obj.constructor);
@@ -347,8 +347,8 @@ function deserializeField(schema: Schema, fieldName: string, fieldType: any, rea
 }
 
 function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader) {
-    if (typeof classType.deserialize === 'function') {
-        return classType.deserialize(reader);
+    if (typeof classType.borshDeserialize === 'function') {
+        return classType.borshDeserialize(reader);
     }
 
     const structSchema = schema.get(classType);
