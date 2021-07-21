@@ -91,9 +91,27 @@ test('serialize/deserialize with class methods', () => {
     expect(newValue).toEqual(item);
 });
 
+test('serialize/deserialize fixed array', () => {
+    const value = new Test({
+        a: ['hello', 'world']
+    });
+    const schema = new Map([[Test, {
+        kind: 'struct',
+        fields: [
+            ['a', ['string', 2]]
+        ]
+    }]]);
+
+    const buf = borsh.serialize(schema, value);
+    const deserializedValue = borsh.deserialize(schema, Test, buf);
+    
+    expect(buf).toEqual(Buffer.from([5, 0, 0, 0, 104, 101, 108, 108, 111, 5, 0, 0, 0, 119, 111, 114, 108, 100]));
+    expect(deserializedValue.a).toEqual(['hello', 'world']);
+});
+
 test('baseEncode string test', async () => {
-    const encodedValue = borsh.baseEncode("244ZQ9cgj3CQ6bWBdytfrJMuMQ1jdXLFGnr4HhvtCTnM");
-    const expectedValue = "HKk9gqNj4xb4rLdJuzT5zzJbLa4vHBdYCxQT9H99csQh6nz3Hfpqn4jtWA92";
+    const encodedValue = borsh.baseEncode('244ZQ9cgj3CQ6bWBdytfrJMuMQ1jdXLFGnr4HhvtCTnM');
+    const expectedValue = 'HKk9gqNj4xb4rLdJuzT5zzJbLa4vHBdYCxQT9H99csQh6nz3Hfpqn4jtWA92';
     expect(encodedValue).toEqual(expectedValue);
 });
 
@@ -102,7 +120,7 @@ test('baseEncode array test', async () => {
 });
 
 test('baseDecode test', async () => {
-    const value = "HKk9gqNj4xb4rLdJu";
+    const value = 'HKk9gqNj4xb4rLdJu';
     const expectedDecodedArray = [3, 96, 254, 84, 10, 240, 93, 199, 52, 244, 164, 240, 6];
     const expectedBuffer = Buffer.from(expectedDecodedArray);
     expect(borsh.baseDecode(value)).toEqual(expectedBuffer);
