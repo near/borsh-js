@@ -109,6 +109,34 @@ test('serialize/deserialize fixed array', () => {
     expect(deserializedValue.a).toEqual(['hello', 'world']);
 });
 
+test('errors serializing fixed array of wrong size', () => {
+    const value = new Test({
+        a: ['hello', 'world', 'you']
+    });
+    const schema = new Map([[Test, {
+        kind: 'struct',
+        fields: [
+            ['a', ['string', 2]]
+        ]
+    }]]);
+
+    expect(() => borsh.serialize(schema, value)).toThrow('Expecting byte array of length 2, but got 3 bytes');
+});
+
+test('errors serializing fixed array of wrong type', () => {
+    const value = new Test({
+        a: [244, 34]
+    });
+    const schema = new Map([[Test, {
+        kind: 'struct',
+        fields: [
+            ['a', ['string', 2]]
+        ]
+    }]]);
+
+    expect(() => borsh.serialize(schema, value)).toThrow('The first argument must be of type string');
+});
+
 test('baseEncode string test', async () => {
     const encodedValue = borsh.baseEncode('244ZQ9cgj3CQ6bWBdytfrJMuMQ1jdXLFGnr4HhvtCTnM');
     const expectedValue = 'HKk9gqNj4xb4rLdJuzT5zzJbLa4vHBdYCxQT9H99csQh6nz3Hfpqn4jtWA92';
