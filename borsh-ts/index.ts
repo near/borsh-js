@@ -246,6 +246,13 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
                     throw new BorshError(`Expecting byte array of length ${fieldType[0]}, but got ${value.length} bytes`);
                 }
                 writer.writeFixedArray(value);
+            } else if(fieldType.length === 2 && typeof fieldType[1] === 'number' ) {
+                if (value.length !== fieldType[1]) {
+                    throw new BorshError(`Expecting byte array of length ${fieldType[1]}, but got ${value.length} bytes`);
+                }
+                for(let i = 0; i < fieldType[1]; i++) {
+                    serializeField(schema, null, value[i], fieldType[0], writer);
+                }
             } else {
                 writer.writeArray(value, (item: any) => { serializeField(schema, fieldName, item, fieldType[0], writer); });
             }
@@ -275,8 +282,8 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
 
 function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
     if (typeof obj.borshSerialize === 'function') {
-      obj.borshSerialize(writer);
-      return;
+        obj.borshSerialize(writer);
+        return;
     }
     const structSchema = schema.get(obj.constructor);
     if (!structSchema) {
@@ -318,9 +325,15 @@ function deserializeField(schema: Schema, fieldName: string, fieldType: any, rea
         if (fieldType instanceof Array) {
             if (typeof fieldType[0] === 'number') {
                 return reader.readFixedArray(fieldType[0]);
+            } else if(typeof fieldType[1] === 'number') {
+                const arr = [];
+                for(let i = 0; i < fieldType[1]; i++) {
+                    arr.push(deserializeField(schema, null, fieldType[0], reader));
+                }
+                return arr;
+            } else {
+                return reader.readArray(() => deserializeField(schema, fieldName, fieldType[0], reader));
             }
-
-            return reader.readArray(() => deserializeField(schema, fieldName, fieldType[0], reader));
         }
 
         if (fieldType.kind === 'option') {
