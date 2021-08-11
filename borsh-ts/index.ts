@@ -346,7 +346,7 @@ function deserializeField(schema: Schema, fieldName: string, fieldType: any, rea
                     reader
                 );
             }
-      
+
             return undefined;
         }
 
@@ -391,7 +391,7 @@ function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader)
 }
 
 /// Deserializes object from bytes using schema.
-export function deserialize(schema: Schema, classType: any, buffer: Buffer): any {
+export function deserialize<T>( schema: Schema, classType: { new (args: any): T }, buffer: Buffer): T {
     const reader = new BinaryReader(buffer);
     const result = deserializeStruct(schema, classType, reader);
     if (reader.offset < buffer.length) {
@@ -401,7 +401,7 @@ export function deserialize(schema: Schema, classType: any, buffer: Buffer): any
 }
 
 /// Deserializes object from bytes using schema, without checking the length read
-export function deserializeUnchecked(schema: Schema, classType: any, buffer: Buffer): any {
+export function deserializeUnchecked<T>(schema: Schema, classType: {new (args: any): T}, buffer: Buffer): T {
     const reader = new BinaryReader(buffer);
     return deserializeStruct(schema, classType, reader);
 }
