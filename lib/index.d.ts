@@ -43,10 +43,10 @@ export declare class BinaryReader {
     readFixedArray(len: number): Uint8Array;
     readArray(fn: any): any[];
 }
-export declare function serialize(schema: Schema, obj: any): Uint8Array;
+export declare function serialize(schema: Schema, obj: any, Writer?: typeof BinaryWriter): Uint8Array;
 export declare function deserialize<T>(schema: Schema, classType: {
     new (args: any): T;
-}, buffer: Buffer): T;
+}, buffer: Buffer, Reader?: typeof BinaryReader): T;
 export declare function deserializeUnchecked<T>(schema: Schema, classType: {
     new (args: any): T;
-}, buffer: Buffer): T;
+}, buffer: Buffer, Reader?: typeof BinaryReader): T;

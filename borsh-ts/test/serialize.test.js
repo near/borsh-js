@@ -87,7 +87,7 @@ test('serialize/deserialize with class methods', () => {
 
     const buf = borsh.serialize(null, item);
     const newValue = borsh.deserialize(null, Serializable, buf);
-    
+
     expect(newValue).toEqual(item);
 });
 
@@ -104,7 +104,7 @@ test('serialize/deserialize fixed array', () => {
 
     const buf = borsh.serialize(schema, value);
     const deserializedValue = borsh.deserialize(schema, Test, buf);
-    
+
     expect(buf).toEqual(Buffer.from([5, 0, 0, 0, 104, 101, 108, 108, 111, 5, 0, 0, 0, 119, 111, 114, 108, 100]));
     expect(deserializedValue.a).toEqual(['hello', 'world']);
 });
@@ -157,4 +157,27 @@ test('baseDecode test', async () => {
 test('base encode and decode test', async () => {
     const value = '244ZQ9cgj3CQ6bWBdytfrJMuMQ1jdXLFGnr4HhvtCTnM';
     expect(borsh.baseEncode(borsh.baseDecode(value))).toEqual(value);
+});
+
+test('serialize with custom writer/reader', async () => {
+    class ExtendedWriter extends borsh.BinaryWriter {
+        writeDate(value) {
+            this.writeU64(value.getTime());
+        }
+    }
+
+    class ExtendedReader extends borsh.BinaryReader {
+        readDate() {
+            const value = this.readU64();
+            return new Date(value.toNumber());
+        }
+    }
+
+    const time = 'Aug 12, 2021 12:00:00 UTC+00:00';
+    const value = new Test({ x: new Date(time) });
+    const schema = new Map([[Test, {kind: 'struct', fields: [['x', 'date']]}]]);
+
+    const buf = borsh.serialize(schema, value, ExtendedWriter);
+    const newValue = borsh.deserialize(schema, Test, buf, ExtendedReader);
+    expect(newValue.x).toEqual(new Date(time));
 });
