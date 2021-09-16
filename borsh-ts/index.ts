@@ -19,7 +19,19 @@ export function baseDecode(value: string): Buffer {
 
 const INITIAL_LENGTH = 1024;
 
-export type Schema = Map<Function, any>;
+type FieldType = 'u8' | 'u16' | 'u32' | 'u64' | 'u128' | 'u256' | 'u512' | 'f32' | 'f64' | [number] | [FieldType, number] | {kind: 'option'; type: FieldType};
+
+type StructTypeInstance = {
+    kind: 'struct';
+    fields: Field[];
+}
+
+type EnumTypeInstance = {kind: 'enum'; field: string; values: Array<[string, FieldType]>}
+
+type Field = [string, FieldType];
+type TypeInstance = StructTypeInstance | EnumTypeInstance;
+
+export type Schema = Map<Function, TypeInstance>
 
 export class BorshError extends Error {
     originalMessage: string;
@@ -234,14 +246,14 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function serializeField(schema: Schema, fieldName: string, value: any, fieldType: any, writer: any) {
+function serializeField(schema: Schema, fieldName: string, value: any, fieldType: FieldType, writer: any) {
     try {
         // TODO: Handle missing values properly (make sure they never result in just skipped write)
         if (typeof fieldType === 'string') {
             writer[`write${capitalizeFirstLetter(fieldType)}`](value);
 
         } else if (fieldType instanceof Array) {
-            if (typeof fieldType[0] === 'number') {
+            if (fieldType.length === 1) {
                 if (value.length !== fieldType[0]) {
                     throw new BorshError(`Expecting byte array of length ${fieldType[0]}, but got ${value.length} bytes`);
                 }
@@ -304,6 +316,7 @@ function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
             }
         }
     } else {
+        // @ts-expect-error Have to deal with JavaScript land
         throw new BorshError(`Unexpected schema kind: ${structSchema.kind} for ${obj.constructor.name}`);
     }
 }
@@ -371,7 +384,7 @@ function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader)
 
     if (structSchema.kind === 'struct') {
         const result = {};
-        for (const [fieldName, fieldType] of schema.get(classType).fields) {
+        for (const [fieldName, fieldType] of structSchema.fields) {
             result[fieldName] = deserializeField(schema, fieldName, fieldType, reader);
         }
         return new classType(result);
@@ -387,6 +400,7 @@ function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader)
         return new classType({ [fieldName]: fieldValue });
     }
 
+    // @ts-expect-error Have to deal with JavaScript land
     throw new BorshError(`Unexpected schema kind: ${structSchema.kind} for ${classType.constructor.name}`);
 }
 
