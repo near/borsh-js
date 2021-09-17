@@ -1,0 +1,12 @@
+name: Borsh Tests
+on: [push]
+jobs:
+    prettier:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: '14'
+            - run: yarn install
+            - run: yarn prettier --check "borsh-ts/index.ts"
