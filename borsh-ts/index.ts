@@ -3,11 +3,12 @@ import bs58 from 'bs58';
 
 // TODO: Make sure this polyfill not included when not required
 import * as encoding from 'text-encoding-utf-8';
-const TextDecoder = (typeof (global as any).TextDecoder !== 'function') ? encoding.TextDecoder : (global as any).TextDecoder;
+const TextDecoder =
+    typeof (global as any).TextDecoder !== 'function' ? encoding.TextDecoder : (global as any).TextDecoder;
 const textDecoder = new TextDecoder('utf-8', { fatal: true });
 
 export function baseEncode(value: Uint8Array | string): string {
-    if (typeof(value) === 'string') {
+    if (typeof value === 'string') {
         value = Buffer.from(value, 'utf8');
     }
     return bs58.encode(Buffer.from(value));
@@ -93,7 +94,11 @@ export class BinaryWriter {
 
     private writeBuffer(buffer: Buffer) {
         // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
-        this.buf = Buffer.concat([Buffer.from(this.buf.subarray(0, this.length)), buffer, Buffer.alloc(INITIAL_LENGTH)]);
+        this.buf = Buffer.concat([
+            Buffer.from(this.buf.subarray(0, this.length)),
+            buffer,
+            Buffer.alloc(INITIAL_LENGTH),
+        ]);
         this.length += buffer.length;
     }
 
@@ -194,7 +199,7 @@ export class BinaryReader {
     }
 
     private readBuffer(len: number): Buffer {
-        if ((this.offset + len) > this.buf.length) {
+        if (this.offset + len > this.buf.length) {
             throw new BorshError(`Expected buffer length ${len} isn't within bounds`);
         }
         const result = this.buf.slice(this.offset, this.offset + len);
@@ -239,35 +244,41 @@ function serializeField(schema: Schema, fieldName: string, value: any, fieldType
         // TODO: Handle missing values properly (make sure they never result in just skipped write)
         if (typeof fieldType === 'string') {
             writer[`write${capitalizeFirstLetter(fieldType)}`](value);
-
         } else if (fieldType instanceof Array) {
             if (typeof fieldType[0] === 'number') {
                 if (value.length !== fieldType[0]) {
-                    throw new BorshError(`Expecting byte array of length ${fieldType[0]}, but got ${value.length} bytes`);
+                    throw new BorshError(
+                        `Expecting byte array of length ${fieldType[0]}, but got ${value.length} bytes`
+                    );
                 }
                 writer.writeFixedArray(value);
-            } else if(fieldType.length === 2 && typeof fieldType[1] === 'number' ) {
+            } else if (fieldType.length === 2 && typeof fieldType[1] === 'number') {
                 if (value.length !== fieldType[1]) {
-                    throw new BorshError(`Expecting byte array of length ${fieldType[1]}, but got ${value.length} bytes`);
+                    throw new BorshError(
+                        `Expecting byte array of length ${fieldType[1]}, but got ${value.length} bytes`
+                    );
                 }
-                for(let i = 0; i < fieldType[1]; i++) {
+                for (let i = 0; i < fieldType[1]; i++) {
                     serializeField(schema, null, value[i], fieldType[0], writer);
                 }
             } else {
-                writer.writeArray(value, (item: any) => { serializeField(schema, fieldName, item, fieldType[0], writer); });
+                writer.writeArray(value, (item: any) => {
+                    serializeField(schema, fieldName, item, fieldType[0], writer);
+                });
             }
         } else if (fieldType.kind !== undefined) {
             switch (fieldType.kind) {
-            case 'option': {
-                if (value === null || value === undefined) {
-                    writer.writeU8(0);
-                } else {
-                    writer.writeU8(1);
-                    serializeField(schema, fieldName, value, fieldType.type, writer);
+                case 'option': {
+                    if (value === null || value === undefined) {
+                        writer.writeU8(0);
+                    } else {
+                        writer.writeU8(1);
+                        serializeField(schema, fieldName, value, fieldType.type, writer);
+                    }
+                    break;
                 }
-                break;
-            }
-            default: throw new BorshError(`FieldType ${fieldType} unrecognized`);
+                default:
+                    throw new BorshError(`FieldType ${fieldType} unrecognized`);
             }
         } else {
             serializeStruct(schema, value, writer);
@@ -325,9 +336,9 @@ function deserializeField(schema: Schema, fieldName: string, fieldType: any, rea
         if (fieldType instanceof Array) {
             if (typeof fieldType[0] === 'number') {
                 return reader.readFixedArray(fieldType[0]);
-            } else if(typeof fieldType[1] === 'number') {
+            } else if (typeof fieldType[1] === 'number') {
                 const arr = [];
-                for(let i = 0; i < fieldType[1]; i++) {
+                for (let i = 0; i < fieldType[1]; i++) {
                     arr.push(deserializeField(schema, null, fieldType[0], reader));
                 }
                 return arr;
@@ -339,12 +350,7 @@ function deserializeField(schema: Schema, fieldName: string, fieldType: any, rea
         if (fieldType.kind === 'option') {
             const option = reader.readU8();
             if (option) {
-                return deserializeField(
-                    schema,
-                    fieldName,
-                    fieldType.type,
-                    reader
-                );
+                return deserializeField(schema, fieldName, fieldType.type, reader);
             }
 
             return undefined;
@@ -391,7 +397,12 @@ function deserializeStruct(schema: Schema, classType: any, reader: BinaryReader)
 }
 
 /// Deserializes object from bytes using schema.
-export function deserialize<T>( schema: Schema, classType: { new (args: any): T }, buffer: Buffer, Reader = BinaryReader): T {
+export function deserialize<T>(
+    schema: Schema,
+    classType: { new (args: any): T },
+    buffer: Buffer,
+    Reader = BinaryReader
+): T {
     const reader = new Reader(buffer);
     const result = deserializeStruct(schema, classType, reader);
     if (reader.offset < buffer.length) {
@@ -401,7 +412,12 @@ export function deserialize<T>( schema: Schema, classType: { new (args: any): T 
 }
 
 /// Deserializes object from bytes using schema, without checking the length read
-export function deserializeUnchecked<T>(schema: Schema, classType: {new (args: any): T}, buffer: Buffer, Reader = BinaryReader): T {
+export function deserializeUnchecked<T>(
+    schema: Schema,
+    classType: { new (args: any): T },
+    buffer: Buffer,
+    Reader = BinaryReader
+): T {
     const reader = new Reader(buffer);
     return deserializeStruct(schema, classType, reader);
 }
