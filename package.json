@@ -11,7 +11,7 @@
         "dev": "yarn build -w",
         "pretest": "yarn build",
         "lint": "eslint borsh-ts/**/*.ts",
-        "pretty": "prettier borsh-ts/**/*.ts package.json --",
+        "pretty": "prettier borsh-ts/**/*.ts package.json",
         "pretty:check": "yarn pretty --check",
         "fix": "eslint borsh-ts/**/*.ts --fix"
     },
