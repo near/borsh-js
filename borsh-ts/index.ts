@@ -19,17 +19,17 @@ export function baseDecode(value: string): Buffer {
 
 const INITIAL_LENGTH = 1024;
 
-type FieldType = 'u8' | 'u16' | 'u32' | 'u64' | 'u128' | 'u256' | 'u512' | 'f32' | 'f64' | [number] | [FieldType, number] | {kind: 'option'; type: FieldType};
+export type FieldType = 'u8' | 'u16' | 'u32' | 'u64' | 'u128' | 'u256' | 'u512' | 'f32' | 'f64' | [number] | [FieldType, number] | {kind: 'option'; type: FieldType};
 
-type StructTypeInstance = {
+export type StructTypeInstance = {
     kind: 'struct';
     fields: Field[];
 }
 
-type EnumTypeInstance = {kind: 'enum'; field: string; values: Array<[string, FieldType]>}
+export type EnumTypeInstance = {kind: 'enum'; field: string; values: Array<[string, FieldType]>}
 
-type Field = [string, FieldType];
-type TypeInstance = StructTypeInstance | EnumTypeInstance;
+export type Field = [string, FieldType];
+export type TypeInstance = StructTypeInstance | EnumTypeInstance;
 
 export type Schema = Map<Function, TypeInstance>
 
