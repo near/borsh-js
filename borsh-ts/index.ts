@@ -311,12 +311,6 @@ function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
     return;
   }
 
-  
-  
-  
-  
-  
-  
   const structSchema = schema.get(obj.constructor);
   if (!structSchema) {
     throw new BorshError(`Class ${obj.constructor.name} is missing in schema`);
