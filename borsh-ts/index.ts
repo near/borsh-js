@@ -310,16 +310,18 @@ function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
     obj.borshSerialize(writer);
     return;
   }
-      const structSchema = schema.get(obj.constructor);
+
+  
+  
+  
+  
+  
+  
+  const structSchema = schema.get(obj.constructor);
   if (!structSchema) {
     throw new BorshError(`Class ${obj.constructor.name} is missing in schema`);
   }
 
-
-
-
-
-  
   if (structSchema.kind === "struct") {
     structSchema.fields.map(([fieldName, fieldType]: [any, any]) => {
       serializeField(schema, fieldName, obj[fieldName], fieldType, writer);

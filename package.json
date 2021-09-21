@@ -12,7 +12,7 @@
     "pretest": "yarn build",
     "lint": "eslint borsh-ts/**/*.ts",
     "pretty": "prettier --write borsh-ts/**/*.ts package.json",
-    "pretty:check": "yarn pretty --check",
+    "pretty:check": "yarn prettier --loglevel error --check  borsh-ts/**/*.ts package.json",
     "fix": "eslint borsh-ts/**/*.ts --fix"
   },
   "repository": {
