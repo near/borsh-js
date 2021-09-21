@@ -120,7 +120,7 @@ test('errors serializing fixed array of wrong size', () => {
         ]
     }]]);
 
-    expect(() => borsh.serialize(schema, value)).toThrow('Exting byte array of length 2, but got 3 bytes');
+    expect(() => borsh.serialize(schema, value)).toThrow('Expecting byte array of length 2, but got 3 bytes');
 });
 
 test('errors serializing fixed array of wrong type', () => {
