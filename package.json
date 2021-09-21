@@ -11,6 +11,8 @@
     "dev": "yarn build -w",
     "pretest": "yarn build",
     "lint": "eslint borsh-ts/**/*.ts",
+    "pretty": "prettier --write borsh-ts/**/*.ts package.json",
+    "pretty:check": "yarn pretty --check",
     "fix": "eslint borsh-ts/**/*.ts --fix"
   },
   "repository": {
@@ -43,6 +45,7 @@
     "jest": "^26.0.1",
     "js-sha256": "^0.9.0",
     "jsfuzz": "^1.0.14",
+    "prettier": "^2.4.1",
     "typescript": "^3.6.2"
   },
   "dependencies": {
