@@ -4,6 +4,11 @@
   "description": "Binary Object Representation Serializer for Hashing",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "LICENSE-APACHE",
+    "LICENSE-MIT.txt"
+  ],
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "test": "jest test --runInBand",
