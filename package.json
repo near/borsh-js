@@ -42,15 +42,17 @@
     "@types/babel__core": "^7.1.2",
     "@types/babel__template": "^7.0.2",
     "@types/bn.js": "^5.1.0",
+    "@types/jest": "^27.0.2",
     "@types/node": "^12.7.3",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
     "bs58": "^4.0.0",
     "eslint": "^6.5.1",
-    "jest": "^26.0.1",
+    "jest": "^27.0.0",
     "js-sha256": "^0.9.0",
     "jsfuzz": "^1.0.14",
     "prettier": "^2.4.1",
+    "ts-jest": "^27.0.7",
     "typescript": "^3.6.2"
   },
   "dependencies": {

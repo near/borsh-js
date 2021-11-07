@@ -20,7 +20,8 @@
     "noImplicitReturns": true,
     "experimentalDecorators": true,
     "noUnusedLocals": true
+    
   },
-  "files": ["./borsh-ts/index.ts"]
+  "files": ["./borsh-ts/index.ts", "./borsh-ts/test/schema.test.ts"]
 }
 
