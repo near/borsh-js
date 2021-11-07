@@ -14,6 +14,8 @@ describe('struct', () => {
 
         }
 
+
+
         const generatedSchemas = generateSchemas([TestStruct]).get(TestStruct)
         const expectedResult: StructKind = {
             kind: 'struct',
@@ -206,13 +208,6 @@ describe('order', () => {
 
             @Field({ type: 'u8' })
             public b: number;
-
-
-            constructor(a?: number, b?: number) {
-                this.a = a
-                this.b = b
-
-            }
         }
         const schema: StructKind = generateSchemas([TestStruct]).get(TestStruct)
         expect(schema).toEqual({
