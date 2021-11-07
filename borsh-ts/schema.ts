@@ -53,27 +53,12 @@ export const Variant = (index: number) => {
     }
 }
 
-export const getSuperClasses = (targetClass) => {
 
-    const ret = [];
-    if (targetClass instanceof Function) {
-        let baseClass = targetClass;
-        while (baseClass) {
-            const newBaseClass = Object.getPrototypeOf(baseClass);
-
-            if (newBaseClass && newBaseClass !== Object && newBaseClass.name) {
-                baseClass = newBaseClass;
-                ret.push(newBaseClass.name);
-            } else {
-                break;
-            }
-        }
-    }
-    return ret;
-}
-
-
-export function Field(fieldInfoPartial: { type: any, option?: boolean, index?: number }) {
+/**
+ * @param properties, the properties of the field mapping to schema
+ * @returns 
+ */
+export function Field(properties: { type: any, option?: boolean, index?: number }) {
     return (target: {} | any, name?: PropertyKey): any => {
         const metaDataKey = structMetaDataKey(target.constructor.name);
         let schema: StructKindDependent = Reflect.getMetadata(metaDataKey, target.constructor); // Assume StructKind already exist
@@ -86,80 +71,49 @@ export function Field(fieldInfoPartial: { type: any, option?: boolean, index?: n
             }
         }
 
-        if (typeof fieldInfoPartial.type === 'function') // struct
+        if (typeof properties.type === 'function') // struct
         {
-            schema.dependencies.add(fieldInfoPartial.type)
+            schema.dependencies.add(properties.type)
         }
 
         let fieldInfo = undefined;
-        if (fieldInfoPartial.option) {
+        if (properties.option) {
             fieldInfo = [key, {
                 kind: 'option',
-                type: fieldInfoPartial.type
+                type: properties.type
             } as OptionKind] // Convert to array type
         }
         else {
-            fieldInfo = [key, fieldInfoPartial.type]
+            fieldInfo = [key, properties.type]
         }
 
-        if (fieldInfoPartial.index === undefined) {
+        if (properties.index === undefined) {
             schema.fields.push(fieldInfo) // add to the end. This will make property decorator execution order define field order
 
         }
         else {
 
-            if (schema.fields[fieldInfoPartial.index]) {
-                throw new BorshError("Multiple fields defined at the same index: " + fieldInfoPartial.index + ", class: " + target.constructor.name)
+            if (schema.fields[properties.index]) {
+                throw new BorshError("Multiple fields defined at the same index: " + properties.index + ", class: " + target.constructor.name)
             }
-            if (fieldInfoPartial.index >= schema.fields.length) {
-                resize(schema.fields, fieldInfoPartial.index + 1, undefined)
+            if (properties.index >= schema.fields.length) {
+                resize(schema.fields, properties.index + 1, undefined)
 
             }
-            schema.fields[fieldInfoPartial.index] = fieldInfo
+            schema.fields[properties.index] = fieldInfo
         }
 
         Reflect.defineMetadata(metaDataKey, schema, target.constructor);
 
-
     };
 }
-/*
-const getMergedKindFields = (object:any):Schema =>
-{
-    const allFields = [];
-    getSuperClasses(object.constructor).forEach((clazz)=>
-    {
-        const fields = (Reflect.getMetadata(fieldMetaDataKey(clazz), object) as KindFields)?.fields;
-        if(fields)
-            allFields.push(...fields);
-    });
-    const subClassSchema = (Reflect.getMetadata(fieldMetaDataKey(object.constructor.name), object) as KindFields);
-    const ret:KindFields  = {
-        fields: [...subClassSchema.fields, ...allFields],
-        name: subClassSchema.name,
-        id: subClassSchema.id
-    }
-    return ret;
-    
-}*/
-/*
-const validateSchema = (schema:Schema) => 
-{
-    const fieldKeys = new Set<string>();
-    schema.fields.forEach((field) => {
-        if(fieldKeys.has(field.key))
-        {
-            throw new Error('Duplicate field: ' + field.key);
-        }
-        fieldKeys.add(field.key);
-    });
-    
-}*/
 
 /**
- * @param object 
+ * @param clazzes 
+ * @param validate, run validation?
+ * @returns Schema map
  */
-export const generateSchema = (clazzes: any[], validate?: boolean): Map<any, StructKind> => {
+export const generateSchemas = (clazzes: any[], validate?: boolean): Map<any, StructKind> => {
     let ret = new Map<any, StructKind>()
     let dependencies = new Set()
     clazzes.forEach((clazz) => {
@@ -183,7 +137,7 @@ export const generateSchema = (clazzes: any[], validate?: boolean): Map<any, Str
     // Generate schemas for nested types
     dependencies.forEach((dependency) => {
         if (!ret.has(dependency)) {
-            const dependencySchema = generateSchema([dependency], validate)
+            const dependencySchema = generateSchemas([dependency], validate)
             dependencySchema.forEach((value, key) => {
                 ret.set(key, value)
             })

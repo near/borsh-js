@@ -18,13 +18,18 @@ export interface FieldMetaData {
  * @returns Schema decorator function for classes
  */
 export declare const Variant: (index: number) => (ctor: Function) => void;
-export declare const getSuperClasses: (targetClass: any) => any[];
-export declare function Field(fieldInfoPartial: {
+/**
+ * @param properties, the properties of the field mapping to schema
+ * @returns
+ */
+export declare function Field(properties: {
     type: any;
     option?: boolean;
     index?: number;
 }): (target: {} | any, name?: PropertyKey) => any;
 /**
- * @param object
+ * @param clazzes
+ * @param validate, run validation?
+ * @returns Schema map
  */
-export declare const generateSchema: (clazzes: any[], validate?: boolean) => Map<any, StructKind>;
+export declare const generateSchemas: (clazzes: any[], validate?: boolean) => Map<any, StructKind>;

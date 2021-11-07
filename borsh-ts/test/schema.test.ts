@@ -1,6 +1,6 @@
 import { BorshError } from "../error";
 import { serialize } from "../index";
-import { generateSchema, StructKind, Field, Variant } from "../schema";
+import { generateSchemas, StructKind, Field, Variant } from "../schema";
 
 describe('struct', () => {
     test('any field by string', () => {
@@ -14,7 +14,7 @@ describe('struct', () => {
 
         }
 
-        const generatedSchemas = generateSchema([TestStruct]).get(TestStruct)
+        const generatedSchemas = generateSchemas([TestStruct]).get(TestStruct)
         const expectedResult: StructKind = {
             kind: 'struct',
             fields: [
@@ -39,7 +39,7 @@ describe('struct', () => {
 
         }
 
-        const generatedSchemas = generateSchema([TestStruct])
+        const generatedSchemas = generateSchemas([TestStruct])
         expect(generatedSchemas.get(TestStruct)).toEqual({
             kind: 'struct',
             fields: [
@@ -69,7 +69,7 @@ describe('enum', () => {
             }
         }
         const instance = new TestEnum(3);
-        const generatedSchemas = generateSchema([TestEnum])
+        const generatedSchemas = generateSchemas([TestEnum])
         const buf = serialize(generatedSchemas, instance);
         expect(buf).toEqual(Buffer.from([1, 3]));
     });
@@ -96,7 +96,7 @@ describe('enum', () => {
             }
         }
         const instance = new TestStruct(new TestEnum(4));
-        const generatedSchemas = generateSchema([TestStruct])
+        const generatedSchemas = generateSchemas([TestStruct])
         const buf = serialize(generatedSchemas, instance);
         expect(buf).toEqual(Buffer.from([1, 4]));
     });
@@ -111,7 +111,7 @@ describe('option', () => {
             public a: number;
 
         }
-        const schema: StructKind = generateSchema([TestStruct]).get(TestStruct)
+        const schema: StructKind = generateSchemas([TestStruct]).get(TestStruct)
         expect(schema).toEqual({
             fields: [
                 [
@@ -145,7 +145,7 @@ describe('order', () => {
 
             }
         }
-        const schema: StructKind = generateSchema([TestStruct]).get(TestStruct)
+        const schema: StructKind = generateSchemas([TestStruct]).get(TestStruct)
         expect(schema).toEqual({
             fields: [
                 [
@@ -169,7 +169,7 @@ describe('order', () => {
             public a: number;
         }
         const thrower = () => {
-            generateSchema([TestStruct], true)
+            generateSchemas([TestStruct], true)
         };
 
         // Error is thrown since 1 field with index 1 is undefined behaviour
@@ -187,7 +187,7 @@ describe('order', () => {
             public b: number;
         }
         const thrower = () => {
-            generateSchema([TestStruct], true)
+            generateSchemas([TestStruct], true)
         };
 
         // Error is thrown since missing field with index 1
@@ -214,7 +214,7 @@ describe('order', () => {
 
             }
         }
-        const schema: StructKind = generateSchema([TestStruct]).get(TestStruct)
+        const schema: StructKind = generateSchemas([TestStruct]).get(TestStruct)
         expect(schema).toEqual({
             fields: [
                 [
