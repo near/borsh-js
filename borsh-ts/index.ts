@@ -291,6 +291,14 @@ function serializeField(
           }
           break;
         }
+        case "map": {
+          writer.writeU32(value.size);
+          value.forEach((val, key) => {
+            serializeField(schema, fieldName, key, fieldType.key, writer);
+            serializeField(schema, fieldName, val, fieldType.value, writer);
+          });
+          break;
+        }
         default:
           throw new BorshError(`FieldType ${fieldType} unrecognized`);
       }
@@ -383,6 +391,16 @@ function deserializeField(
       }
 
       return undefined;
+    }
+    if (fieldType.kind === "map") {
+      let map = new Map();
+      const length = reader.readU32();
+      for (let i = 0; i < length; i++) {
+        const key = deserializeField(schema, fieldName, fieldType.key, reader);
+        const val = deserializeField(schema, fieldName, fieldType.value, reader);
+        map.set(key, val);
+      }
+      return map
     }
 
     return deserializeStruct(schema, fieldType, reader);

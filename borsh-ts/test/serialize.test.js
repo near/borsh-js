@@ -181,3 +181,24 @@ test('serialize with custom writer/reader', async () => {
     const newValue = borsh.deserialize(schema, Test, buf, ExtendedReader);
     expect(newValue.x).toEqual(new Date(time));
 });
+
+test('serialize map', async () => {
+    let map = new Map();
+    for (let i = 0; i < 10; i++) {
+        map.set(new BN(i * 10), "some string " + i.toString());
+    }
+    const value = new Test({ x: map });
+    const schema = new Map([[ Test, {
+        kind: 'struct',
+        fields: [
+            ['x', { kind: 'map', key: 'u64', value: 'string' }],
+        ],
+    }]]);
+
+    const buf = borsh.serialize(schema, value);
+    const deserialized = borsh.deserialize(schema, Test, buf);
+    expect(deserialized.x.size).toEqual(10);
+    deserialized.x.forEach((value, key) => {
+        expect(value).toEqual("some string " + (key.toNumber() / 10).toString());
+    });
+});
