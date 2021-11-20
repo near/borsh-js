@@ -7,8 +7,7 @@
 [![NPM version](https://img.shields.io/npm/v/borsh.svg?style=flat-square)](https://npmjs.com/borsh)
 [![Size on NPM](https://img.shields.io/bundlephobia/minzip/borsh.svg?style=flat-square)](https://npmjs.com/borsh)
 
-**Borsh JS** is an implementation of the [Borsh] binary serialization format for
-JavaScript and TypeScript projects.
+**Borsh TS** is *unofficial* implementation of the [Borsh] binary serialization format for TypeScript projects.
 
 Borsh stands for _Binary Object Representation Serializer for Hashing_. It is meant to be used in security-critical projects as it prioritizes consistency,
 safety, speed, and comes with a strict specification.
