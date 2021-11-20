@@ -1,15 +1,15 @@
 import { BorshError } from "../error";
 import { serialize } from "../index";
-import { generateSchemas, StructKind, Field, Variant } from "../schema";
+import { generateSchemas, StructKind, field, variant } from "../schema";
 
 describe('struct', () => {
     test('any field by string', () => {
 
         class TestStruct {
-            @Field({ type: 'typeA' })
+            @field({ type: 'typeA' })
             public a: number;
 
-            @Field({ type: 'typeB' })
+            @field({ type: 'typeB' })
             public b: number;
 
         }
@@ -30,13 +30,13 @@ describe('struct', () => {
     test('struct fields', () => {
 
         class InnerStruct {
-            @Field({ type: 'typeB' })
+            @field({ type: 'typeB' })
             public b: number;
 
         }
 
         class TestStruct {
-            @Field({ type: InnerStruct })
+            @field({ type: InnerStruct })
             public a: InnerStruct;
 
         }
@@ -60,9 +60,9 @@ describe('struct', () => {
 describe('enum', () => {
     test('enum base', () => {
 
-        @Variant(1)
+        @variant(1)
         class TestEnum {
-            @Field({ type: 'u8' })
+            @field({ type: 'u8' })
             public a: number;
 
             constructor(a: number) {
@@ -78,9 +78,9 @@ describe('enum', () => {
 
     test('enum field', () => {
 
-        @Variant(1)
+        @variant(1)
         class TestEnum {
-            @Field({ type: 'u8' })
+            @field({ type: 'u8' })
             public a: number;
 
             constructor(a: number) {
@@ -90,7 +90,7 @@ describe('enum', () => {
         }
 
         class TestStruct {
-            @Field({ type: TestEnum })
+            @field({ type: TestEnum })
             public enum: TestEnum;
 
             constructor(value: TestEnum) {
@@ -109,7 +109,7 @@ describe('option', () => {
     test('field option', () => {
 
         class TestStruct {
-            @Field({ type: 'u8', option: true })
+            @field({ type: 'u8', option: true })
             public a: number;
 
         }
@@ -133,11 +133,11 @@ describe('order', () => {
     test('explicit', () => {
 
         class TestStruct {
-            @Field({ type: 'u8', index: 1 })
+            @field({ type: 'u8', index: 1 })
             public a: number;
 
 
-            @Field({ type: 'u8', index: 0 })
+            @field({ type: 'u8', index: 0 })
             public b: number;
 
 
@@ -167,7 +167,7 @@ describe('order', () => {
     test('explicit non zero offset', () => {
 
         class TestStruct {
-            @Field({ type: 'u8', index: 1 })
+            @field({ type: 'u8', index: 1 })
             public a: number;
         }
         const thrower = () => {
@@ -183,9 +183,9 @@ describe('order', () => {
     test('explicit gaps', () => {
 
         class TestStruct {
-            @Field({ type: 'u8', index: 0 })
+            @field({ type: 'u8', index: 0 })
             public a: number;
-            @Field({ type: 'u8', index: 2 })
+            @field({ type: 'u8', index: 2 })
             public b: number;
         }
         const thrower = () => {
@@ -202,11 +202,11 @@ describe('order', () => {
     test('implicit', () => {
 
         class TestStruct {
-            @Field({ type: 'u8' })
+            @field({ type: 'u8' })
             public a: number;
 
 
-            @Field({ type: 'u8' })
+            @field({ type: 'u8' })
             public b: number;
         }
         const schema: StructKind = generateSchemas([TestStruct]).get(TestStruct)

@@ -38,7 +38,7 @@ export interface FieldMetaData {
  * @param kind 'struct' or 'variant. 'variant' equivalnt to Rust Enum
  * @returns Schema decorator function for classes
  */
-export const Variant = (index: number) => {
+export const variant = (index: number) => {
     return (ctor: Function) => {
         // Create a custom serialization, for enum by prepend instruction index
         ctor.prototype.borshSerialize = function (schema: Schema, writer: BinaryWriter) {
@@ -58,7 +58,7 @@ export const Variant = (index: number) => {
  * @param properties, the properties of the field mapping to schema
  * @returns 
  */
-export function Field(properties: { type: any, option?: boolean, index?: number }) {
+export function field(properties: { type: any, option?: boolean, index?: number }) {
     return (target: {} | any, name?: PropertyKey): any => {
         const metaDataKey = structMetaDataKey(target.constructor.name);
         let schema: StructKindDependent = Reflect.getMetadata(metaDataKey, target.constructor); // Assume StructKind already exist
