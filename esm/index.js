@@ -1,55 +1,28 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.deserializeUnchecked = exports.deserialize = exports.serialize = exports.BinaryReader = exports.BinaryWriter = exports.BorshError = exports.baseDecode = exports.baseEncode = void 0;
-const bn_js_1 = __importDefault(require("bn.js"));
-const bs58_1 = __importDefault(require("bs58"));
+import BN from "bn.js";
+import bs58 from './bs58';
 // TODO: Make sure this polyfill not included when not required
-const encoding = __importStar(require("text-encoding-utf-8"));
+import * as encoding from "text-encoding-utf-8";
 const TextDecoder = typeof global.TextDecoder !== "function"
     ? encoding.TextDecoder
     : global.TextDecoder;
 const textDecoder = new TextDecoder("utf-8", { fatal: true });
-function baseEncode(value) {
+export function baseEncode(value) {
     if (typeof value === "string") {
         value = Buffer.from(value, "utf8");
     }
-    return bs58_1.default.encode(Buffer.from(value));
+    return bs58.encode(Buffer.from(value));
 }
-exports.baseEncode = baseEncode;
-function baseDecode(value) {
-    return Buffer.from(bs58_1.default.decode(value));
+export function baseDecode(value) {
+    return Buffer.from(bs58.decode(value));
 }
-exports.baseDecode = baseDecode;
 const INITIAL_LENGTH = 1024;
-class BorshError extends Error {
+export class BorshError extends Error {
     constructor(message) {
         super(message);
         this.fieldPath = [];
@@ -61,9 +34,8 @@ class BorshError extends Error {
         this.message = this.originalMessage + ": " + this.fieldPath.join(".");
     }
 }
-exports.BorshError = BorshError;
 /// Binary encoder.
-class BinaryWriter {
+export class BinaryWriter {
     constructor() {
         this.buf = Buffer.alloc(INITIAL_LENGTH);
         this.length = 0;
@@ -90,19 +62,19 @@ class BinaryWriter {
     }
     writeU64(value) {
         this.maybeResize();
-        this.writeBuffer(Buffer.from(new bn_js_1.default(value).toArray("le", 8)));
+        this.writeBuffer(Buffer.from(new BN(value).toArray("le", 8)));
     }
     writeU128(value) {
         this.maybeResize();
-        this.writeBuffer(Buffer.from(new bn_js_1.default(value).toArray("le", 16)));
+        this.writeBuffer(Buffer.from(new BN(value).toArray("le", 16)));
     }
     writeU256(value) {
         this.maybeResize();
-        this.writeBuffer(Buffer.from(new bn_js_1.default(value).toArray("le", 32)));
+        this.writeBuffer(Buffer.from(new BN(value).toArray("le", 32)));
     }
     writeU512(value) {
         this.maybeResize();
-        this.writeBuffer(Buffer.from(new bn_js_1.default(value).toArray("le", 64)));
+        this.writeBuffer(Buffer.from(new BN(value).toArray("le", 64)));
     }
     writeBuffer(buffer) {
         // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
@@ -134,7 +106,6 @@ class BinaryWriter {
         return this.buf.subarray(0, this.length);
     }
 }
-exports.BinaryWriter = BinaryWriter;
 function handlingRangeError(target, propertyKey, propertyDescriptor) {
     const originalMethod = propertyDescriptor.value;
     propertyDescriptor.value = function (...args) {
@@ -152,7 +123,7 @@ function handlingRangeError(target, propertyKey, propertyDescriptor) {
         }
     };
 }
-class BinaryReader {
+export class BinaryReader {
     constructor(buf) {
         this.buf = buf;
         this.offset = 0;
@@ -174,19 +145,19 @@ class BinaryReader {
     }
     readU64() {
         const buf = this.readBuffer(8);
-        return new bn_js_1.default(buf, "le");
+        return new BN(buf, "le");
     }
     readU128() {
         const buf = this.readBuffer(16);
-        return new bn_js_1.default(buf, "le");
+        return new BN(buf, "le");
     }
     readU256() {
         const buf = this.readBuffer(32);
-        return new bn_js_1.default(buf, "le");
+        return new BN(buf, "le");
     }
     readU512() {
         const buf = this.readBuffer(64);
-        return new bn_js_1.default(buf, "le");
+        return new BN(buf, "le");
     }
     readBuffer(len) {
         if (this.offset + len > this.buf.length) {
@@ -249,7 +220,6 @@ __decorate([
 __decorate([
     handlingRangeError
 ], BinaryReader.prototype, "readArray", null);
-exports.BinaryReader = BinaryReader;
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -338,12 +308,11 @@ function serializeStruct(schema, obj, writer) {
 }
 /// Serialize given object using schema of the form:
 /// { class_name -> [ [field_name, field_type], .. ], .. }
-function serialize(schema, obj, Writer = BinaryWriter) {
+export function serialize(schema, obj, Writer = BinaryWriter) {
     const writer = new Writer();
     serializeStruct(schema, obj, writer);
     return writer.toArray();
 }
-exports.serialize = serialize;
 function deserializeField(schema, fieldName, fieldType, reader) {
     try {
         if (typeof fieldType === "string") {
@@ -407,7 +376,7 @@ function deserializeStruct(schema, classType, reader) {
     throw new BorshError(`Unexpected schema kind: ${structSchema.kind} for ${classType.constructor.name}`);
 }
 /// Deserializes object from bytes using schema.
-function deserialize(schema, classType, buffer, Reader = BinaryReader) {
+export function deserialize(schema, classType, buffer, Reader = BinaryReader) {
     const reader = new Reader(buffer);
     const result = deserializeStruct(schema, classType, reader);
     if (reader.offset < buffer.length) {
@@ -415,10 +384,8 @@ function deserialize(schema, classType, buffer, Reader = BinaryReader) {
     }
     return result;
 }
-exports.deserialize = deserialize;
 /// Deserializes object from bytes using schema, without checking the length read
-function deserializeUnchecked(schema, classType, buffer, Reader = BinaryReader) {
+export function deserializeUnchecked(schema, classType, buffer, Reader = BinaryReader) {
     const reader = new Reader(buffer);
     return deserializeStruct(schema, classType, reader);
 }
-exports.deserializeUnchecked = deserializeUnchecked;

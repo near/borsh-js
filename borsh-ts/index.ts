@@ -1,5 +1,5 @@
 import BN from "bn.js";
-import bs58 from "bs58";
+import bs58 from './bs58';
 
 // TODO: Make sure this polyfill not included when not required
 import * as encoding from "text-encoding-utf-8";

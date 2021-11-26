@@ -2,10 +2,12 @@
   "name": "borsh",
   "version": "0.6.0",
   "description": "Binary Object Representation Serializer for Hashing",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "type": "module",
+  "main": "esm/index.js",
+  "module": "esm/index.js",
+  "types": "esm/index.d.ts",
   "files": [
-    "lib",
+    "esm",
     "LICENSE-APACHE",
     "LICENSE-MIT.txt"
   ],
@@ -18,7 +20,12 @@
     "lint": "eslint borsh-ts/**/*.ts",
     "pretty": "prettier --write borsh-ts/**/*.ts package.json",
     "pretty:check": "yarn prettier --loglevel error --check  borsh-ts/**/*.ts package.json",
-    "fix": "eslint borsh-ts/**/*.ts --fix"
+    "fix": "eslint borsh-ts/**/*.ts --fix",
+    "compile": "npm run compile:clean && npm run compile:esm && npm run compile:fix",
+    "compile:clean": "rm -rf lib && rm -rf esm",
+    "compile:cjs": "tsc -p ./tsconfig.json",
+    "compile:esm": "tsc -p ./tsconfig.esm.json",
+    "compile:fix": "./fix_compile.sh"
   },
   "repository": {
     "type": "git",
@@ -45,7 +52,6 @@
     "@types/node": "^12.7.3",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
-    "bs58": "^4.0.0",
     "eslint": "^6.5.1",
     "jest": "^26.0.1",
     "js-sha256": "^0.9.0",
@@ -55,7 +61,6 @@
   },
   "dependencies": {
     "bn.js": "^5.2.0",
-    "bs58": "^4.0.0",
     "text-encoding-utf-8": "^1.0.2"
   }
 }
