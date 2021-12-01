@@ -4,9 +4,7 @@ import bs58 from "bs58";
 // TODO: Make sure this polyfill not included when not required
 import * as encoding from "text-encoding-utf-8";
 const ResolvedTextDecoder =
-  typeof TextDecoder !== "function"
-    ? encoding.TextDecoder
-    : TextDecoder;
+  typeof TextDecoder !== "function" ? encoding.TextDecoder : TextDecoder;
 const textDecoder = new ResolvedTextDecoder("utf-8", { fatal: true });
 
 export function baseEncode(value: Uint8Array | string): string {
@@ -397,10 +395,15 @@ function deserializeField(
       const length = reader.readU32();
       for (let i = 0; i < length; i++) {
         const key = deserializeField(schema, fieldName, fieldType.key, reader);
-        const val = deserializeField(schema, fieldName, fieldType.value, reader);
+        const val = deserializeField(
+          schema,
+          fieldName,
+          fieldType.value,
+          reader
+        );
         map.set(key, val);
       }
-      return map
+      return map;
     }
 
     return deserializeStruct(schema, fieldType, reader);
