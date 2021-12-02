@@ -1,6 +1,6 @@
 {
   "name": "borsh",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Binary Object Representation Serializer for Hashing",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
