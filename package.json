@@ -51,7 +51,7 @@
     "js-sha256": "^0.9.0",
     "jsfuzz": "^1.0.14",
     "prettier": "^2.4.1",
-    "typescript": "^3.6.2"
+    "typescript": "^4"
   },
   "dependencies": {
     "bn.js": "^5.2.0",

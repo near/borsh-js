@@ -1,95 +1,95 @@
-import BN from "bn.js";
-import bs58 from "bs58";
+import BN from 'bn.js'
+import bs58 from 'bs58'
 
 // TODO: Make sure this polyfill not included when not required
-import * as encoding from "text-encoding-utf-8";
+import * as encoding from 'text-encoding-utf-8'
 const ResolvedTextDecoder =
-  typeof TextDecoder !== "function" ? encoding.TextDecoder : TextDecoder;
-const textDecoder = new ResolvedTextDecoder("utf-8", { fatal: true });
+  typeof TextDecoder !== 'function' ? encoding.TextDecoder : TextDecoder
+const textDecoder = new ResolvedTextDecoder('utf-8', { fatal: true })
 
 export function baseEncode(value: Uint8Array | string): string {
-  if (typeof value === "string") {
-    value = Buffer.from(value, "utf8");
+  if (typeof value === 'string') {
+    value = Buffer.from(value, 'utf8')
   }
-  return bs58.encode(Buffer.from(value));
+  return bs58.encode(Buffer.from(value))
 }
 
 export function baseDecode(value: string): Buffer {
-  return Buffer.from(bs58.decode(value));
+  return Buffer.from(bs58.decode(value))
 }
 
-const INITIAL_LENGTH = 1024;
+const INITIAL_LENGTH = 1024
 
-export type Schema = Map<Function, any>;
+export type Schema = Map<Function, any>
 
 export class BorshError extends Error {
-  originalMessage: string;
-  fieldPath: string[] = [];
+  originalMessage: string
+  fieldPath: string[] = []
 
   constructor(message: string) {
-    super(message);
-    this.originalMessage = message;
+    super(message)
+    this.originalMessage = message
   }
 
   addToFieldPath(fieldName: string) {
-    this.fieldPath.splice(0, 0, fieldName);
+    this.fieldPath.splice(0, 0, fieldName)
     // NOTE: Modifying message directly as jest doesn't use .toString()
-    this.message = this.originalMessage + ": " + this.fieldPath.join(".");
+    this.message = this.originalMessage + ': ' + this.fieldPath.join('.')
   }
 }
 
 /// Binary encoder.
 export class BinaryWriter {
-  buf: Buffer;
-  length: number;
+  buf: Buffer
+  length: number
 
   public constructor() {
-    this.buf = Buffer.alloc(INITIAL_LENGTH);
-    this.length = 0;
+    this.buf = Buffer.alloc(INITIAL_LENGTH)
+    this.length = 0
   }
 
   maybeResize() {
     if (this.buf.length < 16 + this.length) {
-      this.buf = Buffer.concat([this.buf, Buffer.alloc(INITIAL_LENGTH)]);
+      this.buf = Buffer.concat([this.buf, Buffer.alloc(INITIAL_LENGTH)])
     }
   }
 
   public writeU8(value: number) {
-    this.maybeResize();
-    this.buf.writeUInt8(value, this.length);
-    this.length += 1;
+    this.maybeResize()
+    this.buf.writeUInt8(value, this.length)
+    this.length += 1
   }
 
   public writeU16(value: number) {
-    this.maybeResize();
-    this.buf.writeUInt16LE(value, this.length);
-    this.length += 2;
+    this.maybeResize()
+    this.buf.writeUInt16LE(value, this.length)
+    this.length += 2
   }
 
   public writeU32(value: number) {
-    this.maybeResize();
-    this.buf.writeUInt32LE(value, this.length);
-    this.length += 4;
+    this.maybeResize()
+    this.buf.writeUInt32LE(value, this.length)
+    this.length += 4
   }
 
   public writeU64(value: number | BN) {
-    this.maybeResize();
-    this.writeBuffer(Buffer.from(new BN(value).toArray("le", 8)));
+    this.maybeResize()
+    this.writeBuffer(Buffer.from(new BN(value).toArray('le', 8)))
   }
 
   public writeU128(value: number | BN) {
-    this.maybeResize();
-    this.writeBuffer(Buffer.from(new BN(value).toArray("le", 16)));
+    this.maybeResize()
+    this.writeBuffer(Buffer.from(new BN(value).toArray('le', 16)))
   }
 
   public writeU256(value: number | BN) {
-    this.maybeResize();
-    this.writeBuffer(Buffer.from(new BN(value).toArray("le", 32)));
+    this.maybeResize()
+    this.writeBuffer(Buffer.from(new BN(value).toArray('le', 32)))
   }
 
   public writeU512(value: number | BN) {
-    this.maybeResize();
-    this.writeBuffer(Buffer.from(new BN(value).toArray("le", 64)));
+    this.maybeResize()
+    this.writeBuffer(Buffer.from(new BN(value).toArray('le', 64)))
   }
 
   private writeBuffer(buffer: Buffer) {
@@ -98,32 +98,32 @@ export class BinaryWriter {
       Buffer.from(this.buf.subarray(0, this.length)),
       buffer,
       Buffer.alloc(INITIAL_LENGTH),
-    ]);
-    this.length += buffer.length;
+    ])
+    this.length += buffer.length
   }
 
   public writeString(str: string) {
-    this.maybeResize();
-    const b = Buffer.from(str, "utf8");
-    this.writeU32(b.length);
-    this.writeBuffer(b);
+    this.maybeResize()
+    const b = Buffer.from(str, 'utf8')
+    this.writeU32(b.length)
+    this.writeBuffer(b)
   }
 
   public writeFixedArray(array: Uint8Array) {
-    this.writeBuffer(Buffer.from(array));
+    this.writeBuffer(Buffer.from(array))
   }
 
   public writeArray(array: any[], fn: any) {
-    this.maybeResize();
-    this.writeU32(array.length);
+    this.maybeResize()
+    this.writeU32(array.length)
     for (const elem of array) {
-      this.maybeResize();
-      fn(elem);
+      this.maybeResize()
+      fn(elem)
     }
   }
 
   public toArray(): Uint8Array {
-    return this.buf.subarray(0, this.length);
+    return this.buf.subarray(0, this.length)
   }
 }
 
@@ -132,117 +132,117 @@ function handlingRangeError(
   propertyKey: string,
   propertyDescriptor: PropertyDescriptor
 ) {
-  const originalMethod = propertyDescriptor.value;
+  const originalMethod = propertyDescriptor.value
   propertyDescriptor.value = function (...args: any[]) {
     try {
-      return originalMethod.apply(this, args);
+      return originalMethod.apply(this, args)
     } catch (e) {
       if (e instanceof RangeError) {
-        const code = (e as any).code;
+        const code = (e as any).code
         if (
-          ["ERR_BUFFER_OUT_OF_BOUNDS", "ERR_OUT_OF_RANGE"].indexOf(code) >= 0
+          ['ERR_BUFFER_OUT_OF_BOUNDS', 'ERR_OUT_OF_RANGE'].indexOf(code) >= 0
         ) {
-          throw new BorshError("Reached the end of buffer when deserializing");
+          throw new BorshError('Reached the end of buffer when deserializing')
         }
       }
-      throw e;
+      throw e
     }
-  };
+  }
 }
 
 export class BinaryReader {
-  buf: Buffer;
-  offset: number;
+  buf: Buffer
+  offset: number
 
   public constructor(buf: Buffer) {
-    this.buf = buf;
-    this.offset = 0;
+    this.buf = buf
+    this.offset = 0
   }
 
   @handlingRangeError
   readU8(): number {
-    const value = this.buf.readUInt8(this.offset);
-    this.offset += 1;
-    return value;
+    const value = this.buf.readUInt8(this.offset)
+    this.offset += 1
+    return value
   }
 
   @handlingRangeError
   readU16(): number {
-    const value = this.buf.readUInt16LE(this.offset);
-    this.offset += 2;
-    return value;
+    const value = this.buf.readUInt16LE(this.offset)
+    this.offset += 2
+    return value
   }
 
   @handlingRangeError
   readU32(): number {
-    const value = this.buf.readUInt32LE(this.offset);
-    this.offset += 4;
-    return value;
+    const value = this.buf.readUInt32LE(this.offset)
+    this.offset += 4
+    return value
   }
 
   @handlingRangeError
   readU64(): BN {
-    const buf = this.readBuffer(8);
-    return new BN(buf, "le");
+    const buf = this.readBuffer(8)
+    return new BN(buf, 'le')
   }
 
   @handlingRangeError
   readU128(): BN {
-    const buf = this.readBuffer(16);
-    return new BN(buf, "le");
+    const buf = this.readBuffer(16)
+    return new BN(buf, 'le')
   }
 
   @handlingRangeError
   readU256(): BN {
-    const buf = this.readBuffer(32);
-    return new BN(buf, "le");
+    const buf = this.readBuffer(32)
+    return new BN(buf, 'le')
   }
 
   @handlingRangeError
   readU512(): BN {
-    const buf = this.readBuffer(64);
-    return new BN(buf, "le");
+    const buf = this.readBuffer(64)
+    return new BN(buf, 'le')
   }
 
   private readBuffer(len: number): Buffer {
     if (this.offset + len > this.buf.length) {
-      throw new BorshError(`Expected buffer length ${len} isn't within bounds`);
+      throw new BorshError(`Expected buffer length ${len} isn't within bounds`)
     }
-    const result = this.buf.slice(this.offset, this.offset + len);
-    this.offset += len;
-    return result;
+    const result = this.buf.slice(this.offset, this.offset + len)
+    this.offset += len
+    return result
   }
 
   @handlingRangeError
   readString(): string {
-    const len = this.readU32();
-    const buf = this.readBuffer(len);
+    const len = this.readU32()
+    const buf = this.readBuffer(len)
     try {
       // NOTE: Using TextDecoder to fail on invalid UTF-8
-      return textDecoder.decode(buf);
+      return textDecoder.decode(buf)
     } catch (e) {
-      throw new BorshError(`Error decoding UTF-8 string: ${e}`);
+      throw new BorshError(`Error decoding UTF-8 string: ${e}`)
     }
   }
 
   @handlingRangeError
   readFixedArray(len: number): Uint8Array {
-    return new Uint8Array(this.readBuffer(len));
+    return new Uint8Array(this.readBuffer(len))
   }
 
   @handlingRangeError
   readArray(fn: any): any[] {
-    const len = this.readU32();
-    const result = Array<any>();
+    const len = this.readU32()
+    const result = Array<any>()
     for (let i = 0; i < len; ++i) {
-      result.push(fn());
+      result.push(fn())
     }
-    return result;
+    return result
   }
 }
 
 function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
 function serializeField(
@@ -254,92 +254,92 @@ function serializeField(
 ) {
   try {
     // TODO: Handle missing values properly (make sure they never result in just skipped write)
-    if (typeof fieldType === "string") {
-      writer[`write${capitalizeFirstLetter(fieldType)}`](value);
+    if (typeof fieldType === 'string') {
+      writer[`write${capitalizeFirstLetter(fieldType)}`](value)
     } else if (fieldType instanceof Array) {
-      if (typeof fieldType[0] === "number") {
+      if (typeof fieldType[0] === 'number') {
         if (value.length !== fieldType[0]) {
           throw new BorshError(
             `Expecting byte array of length ${fieldType[0]}, but got ${value.length} bytes`
-          );
+          )
         }
-        writer.writeFixedArray(value);
-      } else if (fieldType.length === 2 && typeof fieldType[1] === "number") {
+        writer.writeFixedArray(value)
+      } else if (fieldType.length === 2 && typeof fieldType[1] === 'number') {
         if (value.length !== fieldType[1]) {
           throw new BorshError(
             `Expecting byte array of length ${fieldType[1]}, but got ${value.length} bytes`
-          );
+          )
         }
         for (let i = 0; i < fieldType[1]; i++) {
-          serializeField(schema, null, value[i], fieldType[0], writer);
+          serializeField(schema, null, value[i], fieldType[0], writer)
         }
       } else {
         writer.writeArray(value, (item: any) => {
-          serializeField(schema, fieldName, item, fieldType[0], writer);
-        });
+          serializeField(schema, fieldName, item, fieldType[0], writer)
+        })
       }
     } else if (fieldType.kind !== undefined) {
       switch (fieldType.kind) {
-        case "option": {
+        case 'option': {
           if (value === null || value === undefined) {
-            writer.writeU8(0);
+            writer.writeU8(0)
           } else {
-            writer.writeU8(1);
-            serializeField(schema, fieldName, value, fieldType.type, writer);
+            writer.writeU8(1)
+            serializeField(schema, fieldName, value, fieldType.type, writer)
           }
-          break;
+          break
         }
-        case "map": {
-          writer.writeU32(value.size);
+        case 'map': {
+          writer.writeU32(value.size)
           value.forEach((val, key) => {
-            serializeField(schema, fieldName, key, fieldType.key, writer);
-            serializeField(schema, fieldName, val, fieldType.value, writer);
-          });
-          break;
+            serializeField(schema, fieldName, key, fieldType.key, writer)
+            serializeField(schema, fieldName, val, fieldType.value, writer)
+          })
+          break
         }
         default:
-          throw new BorshError(`FieldType ${fieldType} unrecognized`);
+          throw new BorshError(`FieldType ${fieldType} unrecognized`)
       }
     } else {
-      serializeStruct(schema, value, writer);
+      serializeStruct(schema, value, writer)
     }
   } catch (error) {
     if (error instanceof BorshError) {
-      error.addToFieldPath(fieldName);
+      error.addToFieldPath(fieldName)
     }
-    throw error;
+    throw error
   }
 }
 
 function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
-  if (typeof obj.borshSerialize === "function") {
-    obj.borshSerialize(writer);
-    return;
+  if (typeof obj.borshSerialize === 'function') {
+    obj.borshSerialize(writer)
+    return
   }
 
-  const structSchema = schema.get(obj.constructor);
+  const structSchema = schema.get(obj.constructor)
   if (!structSchema) {
-    throw new BorshError(`Class ${obj.constructor.name} is missing in schema`);
+    throw new BorshError(`Class ${obj.constructor.name} is missing in schema`)
   }
 
-  if (structSchema.kind === "struct") {
+  if (structSchema.kind === 'struct') {
     structSchema.fields.map(([fieldName, fieldType]: [any, any]) => {
-      serializeField(schema, fieldName, obj[fieldName], fieldType, writer);
-    });
-  } else if (structSchema.kind === "enum") {
-    const name = obj[structSchema.field];
+      serializeField(schema, fieldName, obj[fieldName], fieldType, writer)
+    })
+  } else if (structSchema.kind === 'enum') {
+    const name = obj[structSchema.field]
     for (let idx = 0; idx < structSchema.values.length; ++idx) {
-      const [fieldName, fieldType]: [any, any] = structSchema.values[idx];
+      const [fieldName, fieldType]: [any, any] = structSchema.values[idx]
       if (fieldName === name) {
-        writer.writeU8(idx);
-        serializeField(schema, fieldName, obj[fieldName], fieldType, writer);
-        break;
+        writer.writeU8(idx)
+        serializeField(schema, fieldName, obj[fieldName], fieldType, writer)
+        break
       }
     }
   } else {
     throw new BorshError(
       `Unexpected schema kind: ${structSchema.kind} for ${obj.constructor.name}`
-    );
+    )
   }
 }
 
@@ -350,9 +350,9 @@ export function serialize(
   obj: any,
   Writer = BinaryWriter
 ): Uint8Array {
-  const writer = new Writer();
-  serializeStruct(schema, obj, writer);
-  return writer.toArray();
+  const writer = new Writer()
+  serializeStruct(schema, obj, writer)
+  return writer.toArray()
 }
 
 function deserializeField(
@@ -362,56 +362,51 @@ function deserializeField(
   reader: BinaryReader
 ): any {
   try {
-    if (typeof fieldType === "string") {
-      return reader[`read${capitalizeFirstLetter(fieldType)}`]();
+    if (typeof fieldType === 'string') {
+      return reader[`read${capitalizeFirstLetter(fieldType)}`]()
     }
 
     if (fieldType instanceof Array) {
-      if (typeof fieldType[0] === "number") {
-        return reader.readFixedArray(fieldType[0]);
-      } else if (typeof fieldType[1] === "number") {
-        const arr = [];
+      if (typeof fieldType[0] === 'number') {
+        return reader.readFixedArray(fieldType[0])
+      } else if (typeof fieldType[1] === 'number') {
+        const arr = []
         for (let i = 0; i < fieldType[1]; i++) {
-          arr.push(deserializeField(schema, null, fieldType[0], reader));
+          arr.push(deserializeField(schema, null, fieldType[0], reader))
         }
-        return arr;
+        return arr
       } else {
         return reader.readArray(() =>
           deserializeField(schema, fieldName, fieldType[0], reader)
-        );
+        )
       }
     }
 
-    if (fieldType.kind === "option") {
-      const option = reader.readU8();
+    if (fieldType.kind === 'option') {
+      const option = reader.readU8()
       if (option) {
-        return deserializeField(schema, fieldName, fieldType.type, reader);
+        return deserializeField(schema, fieldName, fieldType.type, reader)
       }
 
-      return undefined;
+      return undefined
     }
-    if (fieldType.kind === "map") {
-      let map = new Map();
-      const length = reader.readU32();
+    if (fieldType.kind === 'map') {
+      let map = new Map()
+      const length = reader.readU32()
       for (let i = 0; i < length; i++) {
-        const key = deserializeField(schema, fieldName, fieldType.key, reader);
-        const val = deserializeField(
-          schema,
-          fieldName,
-          fieldType.value,
-          reader
-        );
-        map.set(key, val);
+        const key = deserializeField(schema, fieldName, fieldType.key, reader)
+        const val = deserializeField(schema, fieldName, fieldType.value, reader)
+        map.set(key, val)
       }
-      return map;
+      return map
     }
 
-    return deserializeStruct(schema, fieldType, reader);
+    return deserializeStruct(schema, fieldType, reader)
   } catch (error) {
     if (error instanceof BorshError) {
-      error.addToFieldPath(fieldName);
+      error.addToFieldPath(fieldName)
     }
-    throw error;
+    throw error
   }
 }
 
@@ -420,41 +415,36 @@ function deserializeStruct(
   classType: any,
   reader: BinaryReader
 ) {
-  if (typeof classType.borshDeserialize === "function") {
-    return classType.borshDeserialize(reader);
+  if (typeof classType.borshDeserialize === 'function') {
+    return classType.borshDeserialize(reader)
   }
 
-  const structSchema = schema.get(classType);
+  const structSchema = schema.get(classType)
   if (!structSchema) {
-    throw new BorshError(`Class ${classType.name} is missing in schema`);
+    throw new BorshError(`Class ${classType.name} is missing in schema`)
   }
 
-  if (structSchema.kind === "struct") {
-    const result = {};
+  if (structSchema.kind === 'struct') {
+    const result = {}
     for (const [fieldName, fieldType] of schema.get(classType).fields) {
-      result[fieldName] = deserializeField(
-        schema,
-        fieldName,
-        fieldType,
-        reader
-      );
+      result[fieldName] = deserializeField(schema, fieldName, fieldType, reader)
     }
-    return new classType(result);
+    return new classType(result)
   }
 
-  if (structSchema.kind === "enum") {
-    const idx = reader.readU8();
+  if (structSchema.kind === 'enum') {
+    const idx = reader.readU8()
     if (idx >= structSchema.values.length) {
-      throw new BorshError(`Enum index: ${idx} is out of range`);
+      throw new BorshError(`Enum index: ${idx} is out of range`)
     }
-    const [fieldName, fieldType] = structSchema.values[idx];
-    const fieldValue = deserializeField(schema, fieldName, fieldType, reader);
-    return new classType({ [fieldName]: fieldValue });
+    const [fieldName, fieldType] = structSchema.values[idx]
+    const fieldValue = deserializeField(schema, fieldName, fieldType, reader)
+    return new classType({ [fieldName]: fieldValue })
   }
 
   throw new BorshError(
     `Unexpected schema kind: ${structSchema.kind} for ${classType.constructor.name}`
-  );
+  )
 }
 
 /// Deserializes object from bytes using schema.
@@ -464,16 +454,16 @@ export function deserialize<T>(
   buffer: Buffer,
   Reader = BinaryReader
 ): T {
-  const reader = new Reader(buffer);
-  const result = deserializeStruct(schema, classType, reader);
+  const reader = new Reader(buffer)
+  const result = deserializeStruct(schema, classType, reader)
   if (reader.offset < buffer.length) {
     throw new BorshError(
       `Unexpected ${
         buffer.length - reader.offset
       } bytes after deserialized data`
-    );
+    )
   }
-  return result;
+  return result
 }
 
 /// Deserializes object from bytes using schema, without checking the length read
@@ -483,6 +473,6 @@ export function deserializeUnchecked<T>(
   buffer: Buffer,
   Reader = BinaryReader
 ): T {
-  const reader = new Reader(buffer);
-  return deserializeStruct(schema, classType, reader);
+  const reader = new Reader(buffer)
+  return deserializeStruct(schema, classType, reader)
 }
