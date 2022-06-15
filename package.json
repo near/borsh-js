@@ -15,8 +15,8 @@
     "fuzz": "jsfuzz borsh-ts/test/fuzz/borsh-roundtrip.js borsh-ts/test/fuzz/corpus/",
     "dev": "yarn build -w",
     "pretest": "yarn build",
-    "lint": "eslint borsh-ts/**/*.ts",
-    "fix": "eslint borsh-ts/**/*.ts --fix"
+    "lint": "eslint borsh-ts/**/*",
+    "fix": "eslint borsh-ts/**/* --fix"
   },
   "repository": {
     "type": "git",

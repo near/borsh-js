@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+    return (mod && mod.__esModule) ? mod : { 'default': mod };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const js_sha256_1 = __importDefault(require("js-sha256"));
-const enums_1 = require("./enums");
-const serialize_1 = require("./serialize");
-const key_pair_1 = require("./key_pair");
+Object.defineProperty(exports, '__esModule', { value: true });
+const js_sha256_1 = __importDefault(require('js-sha256'));
+const enums_1 = require('./enums');
+const serialize_1 = require('./serialize');
+const key_pair_1 = require('./key_pair');
 class FunctionCallPermission extends enums_1.Assignable {
 }
 exports.FunctionCallPermission = FunctionCallPermission;
@@ -127,76 +127,76 @@ class Action extends enums_1.Enum {
 exports.Action = Action;
 exports.SCHEMA = new Map([
     [Signature, { kind: 'struct', fields: [
-                ['keyType', 'u8'],
-                ['data', [64]]
-            ] }],
+        ['keyType', 'u8'],
+        ['data', [64]]
+    ] }],
     [SignedTransaction, { kind: 'struct', fields: [
-                ['transaction', Transaction],
-                ['signature', Signature]
-            ] }],
+        ['transaction', Transaction],
+        ['signature', Signature]
+    ] }],
     [Transaction, { kind: 'struct', fields: [
-                ['signerId', 'string'],
-                ['publicKey', key_pair_1.PublicKey],
-                ['nonce', 'u64'],
-                ['receiverId', 'string'],
-                ['blockHash', [32]],
-                ['actions', [Action]]
-            ] }],
+        ['signerId', 'string'],
+        ['publicKey', key_pair_1.PublicKey],
+        ['nonce', 'u64'],
+        ['receiverId', 'string'],
+        ['blockHash', [32]],
+        ['actions', [Action]]
+    ] }],
     [key_pair_1.PublicKey, { kind: 'struct', fields: [
-                ['keyType', 'u8'],
-                ['data', [32]]
-            ] }],
+        ['keyType', 'u8'],
+        ['data', [32]]
+    ] }],
     [AccessKey, { kind: 'struct', fields: [
-                ['nonce', 'u64'],
-                ['permission', AccessKeyPermission],
-            ] }],
+        ['nonce', 'u64'],
+        ['permission', AccessKeyPermission],
+    ] }],
     [AccessKeyPermission, { kind: 'enum', field: 'enum', values: [
-                ['functionCall', FunctionCallPermission],
-                ['fullAccess', FullAccessPermission],
-            ] }],
+        ['functionCall', FunctionCallPermission],
+        ['fullAccess', FullAccessPermission],
+    ] }],
     [FunctionCallPermission, { kind: 'struct', fields: [
-                ['allowance', { kind: 'option', type: 'u128' }],
-                ['receiverId', 'string'],
-                ['methodNames', ['string']],
-            ] }],
+        ['allowance', { kind: 'option', type: 'u128' }],
+        ['receiverId', 'string'],
+        ['methodNames', ['string']],
+    ] }],
     [FullAccessPermission, { kind: 'struct', fields: [] }],
     [Action, { kind: 'enum', field: 'enum', values: [
-                ['createAccount', CreateAccount],
-                ['deployContract', DeployContract],
-                ['functionCall', FunctionCall],
-                ['transfer', Transfer],
-                ['stake', Stake],
-                ['addKey', AddKey],
-                ['deleteKey', DeleteKey],
-                ['deleteAccount', DeleteAccount],
-            ] }],
+        ['createAccount', CreateAccount],
+        ['deployContract', DeployContract],
+        ['functionCall', FunctionCall],
+        ['transfer', Transfer],
+        ['stake', Stake],
+        ['addKey', AddKey],
+        ['deleteKey', DeleteKey],
+        ['deleteAccount', DeleteAccount],
+    ] }],
     [CreateAccount, { kind: 'struct', fields: [] }],
     [DeployContract, { kind: 'struct', fields: [
-                ['code', ['u8']]
-            ] }],
+        ['code', ['u8']]
+    ] }],
     [FunctionCall, { kind: 'struct', fields: [
-                ['methodName', 'string'],
-                ['args', ['u8']],
-                ['gas', 'u64'],
-                ['deposit', 'u128']
-            ] }],
+        ['methodName', 'string'],
+        ['args', ['u8']],
+        ['gas', 'u64'],
+        ['deposit', 'u128']
+    ] }],
     [Transfer, { kind: 'struct', fields: [
-                ['deposit', 'u128']
-            ] }],
+        ['deposit', 'u128']
+    ] }],
     [Stake, { kind: 'struct', fields: [
-                ['stake', 'u128'],
-                ['publicKey', key_pair_1.PublicKey]
-            ] }],
+        ['stake', 'u128'],
+        ['publicKey', key_pair_1.PublicKey]
+    ] }],
     [AddKey, { kind: 'struct', fields: [
-                ['publicKey', key_pair_1.PublicKey],
-                ['accessKey', AccessKey]
-            ] }],
+        ['publicKey', key_pair_1.PublicKey],
+        ['accessKey', AccessKey]
+    ] }],
     [DeleteKey, { kind: 'struct', fields: [
-                ['publicKey', key_pair_1.PublicKey]
-            ] }],
+        ['publicKey', key_pair_1.PublicKey]
+    ] }],
     [DeleteAccount, { kind: 'struct', fields: [
-                ['beneficiaryId', 'string']
-            ] }],
+        ['beneficiaryId', 'string']
+    ] }],
 ]);
 function createTransaction(signerId, publicKey, receiverId, nonce, actions, blockHash) {
     return new Transaction({ signerId, publicKey, nonce, receiverId, actions, blockHash });

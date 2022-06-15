@@ -185,7 +185,7 @@ test('serialize with custom writer/reader', async () => {
 test('serialize map', async () => {
     let map = new Map();
     for (let i = 0; i < 10; i++) {
-        map.set(new BN(i * 10), "some string " + i.toString());
+        map.set(new BN(i * 10), 'some string ' + i.toString());
     }
     const value = new Test({ x: map });
     const schema = new Map([[ Test, {
@@ -199,6 +199,6 @@ test('serialize map', async () => {
     const deserialized = borsh.deserialize(schema, Test, buf);
     expect(deserialized.x.size).toEqual(10);
     deserialized.x.forEach((value, key) => {
-        expect(value).toEqual("some string " + (key.toNumber() / 10).toString());
+        expect(value).toEqual('some string ' + (key.toNumber() / 10).toString());
     });
 });

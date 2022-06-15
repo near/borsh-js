@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+    return (mod && mod.__esModule) ? mod : { 'default': mod };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const js_sha256_1 = __importDefault(require("js-sha256"));
-const key_pair_1 = require("./key_pair");
-const key_stores_1 = require("./key_stores");
+Object.defineProperty(exports, '__esModule', { value: true });
+const js_sha256_1 = __importDefault(require('js-sha256'));
+const key_pair_1 = require('./key_pair');
+const key_stores_1 = require('./key_stores');
 /**
  * General signing interface, can be used for in memory signing, RPC singing, external wallet, HSM, etc.
  */
