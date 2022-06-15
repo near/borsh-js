@@ -54,45 +54,52 @@ export class BinaryWriter {
     }
   }
 
-  public writeU8(value: number) {
+  public writeU8(value: number) : BinaryWriter {
     this.maybeResize();
     this.buf.writeUInt8(value, this.length);
     this.length += 1;
+    return this;
   }
 
-  public writeU16(value: number) {
+  public writeU16(value: number) : BinaryWriter {
     this.maybeResize();
     this.buf.writeUInt16LE(value, this.length);
     this.length += 2;
+    return this;
   }
 
-  public writeU32(value: number) {
+  public writeU32(value: number) : BinaryWriter {
     this.maybeResize();
     this.buf.writeUInt32LE(value, this.length);
     this.length += 4;
+    return this;
   }
 
-  public writeU64(value: number | BN) {
+  public writeU64(value: number | BN) : BinaryWriter {
     this.maybeResize();
     this.writeBuffer(Buffer.from(new BN(value).toArray("le", 8)));
+    return this;
   }
 
-  public writeU128(value: number | BN) {
+  public writeU128(value: number | BN) : BinaryWriter {
     this.maybeResize();
     this.writeBuffer(Buffer.from(new BN(value).toArray("le", 16)));
+    return this;
   }
 
-  public writeU256(value: number | BN) {
+  public writeU256(value: number | BN) : BinaryWriter {
     this.maybeResize();
     this.writeBuffer(Buffer.from(new BN(value).toArray("le", 32)));
+    return this;
   }
 
-  public writeU512(value: number | BN) {
+  public writeU512(value: number | BN) : BinaryWriter {
     this.maybeResize();
     this.writeBuffer(Buffer.from(new BN(value).toArray("le", 64)));
+    return this;
   }
 
-  private writeBuffer(buffer: Buffer) {
+  private writeBuffer(buffer: Buffer) : BinaryWriter {
     // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
     this.buf = Buffer.concat([
       Buffer.from(this.buf.subarray(0, this.length)),
@@ -100,26 +107,30 @@ export class BinaryWriter {
       Buffer.alloc(INITIAL_LENGTH),
     ]);
     this.length += buffer.length;
+    return this;
   }
 
-  public writeString(str: string) {
+  public writeString(str: string) : BinaryWriter {
     this.maybeResize();
     const b = Buffer.from(str, "utf8");
     this.writeU32(b.length);
     this.writeBuffer(b);
+    return this;
   }
 
-  public writeFixedArray(array: Uint8Array) {
+  public writeFixedArray(array: Uint8Array) : BinaryWriter {
     this.writeBuffer(Buffer.from(array));
+    return this;
   }
 
-  public writeArray(array: any[], fn: any) {
+  public writeArray(array: any[], fn: any) : BinaryWriter {
     this.maybeResize();
     this.writeU32(array.length);
     for (const elem of array) {
       this.maybeResize();
       fn(elem);
     }
+    return this;
   }
 
   public toArray(): Uint8Array {
