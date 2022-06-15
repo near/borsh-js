@@ -4,7 +4,7 @@ import bs58 from 'bs58';
 // TODO: Make sure this polyfill not included when not required
 import * as encoding from 'text-encoding-utf-8';
 const ResolvedTextDecoder =
-  typeof TextDecoder !== 'function' ? encoding.TextDecoder : TextDecoder;
+    typeof TextDecoder !== 'function' ? encoding.TextDecoder : TextDecoder;
 const textDecoder = new ResolvedTextDecoder('utf-8', { fatal: true });
 
 export function baseEncode(value: Uint8Array | string): string {
@@ -93,7 +93,7 @@ export class BinaryWriter {
     }
 
     private writeBuffer(buffer: Buffer) {
-    // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
+        // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
         this.buf = Buffer.concat([
             Buffer.from(this.buf.subarray(0, this.length)),
             buffer,
@@ -159,86 +159,86 @@ export class BinaryReader {
         this.offset = 0;
     }
 
-  @handlingRangeError
+    @handlingRangeError
     readU8(): number {
         const value = this.buf.readUInt8(this.offset);
         this.offset += 1;
         return value;
     }
 
-  @handlingRangeError
-  readU16(): number {
-      const value = this.buf.readUInt16LE(this.offset);
-      this.offset += 2;
-      return value;
-  }
+    @handlingRangeError
+    readU16(): number {
+        const value = this.buf.readUInt16LE(this.offset);
+        this.offset += 2;
+        return value;
+    }
 
-  @handlingRangeError
-  readU32(): number {
-      const value = this.buf.readUInt32LE(this.offset);
-      this.offset += 4;
-      return value;
-  }
+    @handlingRangeError
+    readU32(): number {
+        const value = this.buf.readUInt32LE(this.offset);
+        this.offset += 4;
+        return value;
+    }
 
-  @handlingRangeError
-  readU64(): BN {
-      const buf = this.readBuffer(8);
-      return new BN(buf, 'le');
-  }
+    @handlingRangeError
+    readU64(): BN {
+        const buf = this.readBuffer(8);
+        return new BN(buf, 'le');
+    }
 
-  @handlingRangeError
-  readU128(): BN {
-      const buf = this.readBuffer(16);
-      return new BN(buf, 'le');
-  }
+    @handlingRangeError
+    readU128(): BN {
+        const buf = this.readBuffer(16);
+        return new BN(buf, 'le');
+    }
 
-  @handlingRangeError
-  readU256(): BN {
-      const buf = this.readBuffer(32);
-      return new BN(buf, 'le');
-  }
+    @handlingRangeError
+    readU256(): BN {
+        const buf = this.readBuffer(32);
+        return new BN(buf, 'le');
+    }
 
-  @handlingRangeError
-  readU512(): BN {
-      const buf = this.readBuffer(64);
-      return new BN(buf, 'le');
-  }
+    @handlingRangeError
+    readU512(): BN {
+        const buf = this.readBuffer(64);
+        return new BN(buf, 'le');
+    }
 
-  private readBuffer(len: number): Buffer {
-      if (this.offset + len > this.buf.length) {
-          throw new BorshError(`Expected buffer length ${len} isn't within bounds`);
-      }
-      const result = this.buf.slice(this.offset, this.offset + len);
-      this.offset += len;
-      return result;
-  }
+    private readBuffer(len: number): Buffer {
+        if (this.offset + len > this.buf.length) {
+            throw new BorshError(`Expected buffer length ${len} isn't within bounds`);
+        }
+        const result = this.buf.slice(this.offset, this.offset + len);
+        this.offset += len;
+        return result;
+    }
 
-  @handlingRangeError
-  readString(): string {
-      const len = this.readU32();
-      const buf = this.readBuffer(len);
-      try {
-      // NOTE: Using TextDecoder to fail on invalid UTF-8
-          return textDecoder.decode(buf);
-      } catch (e) {
-          throw new BorshError(`Error decoding UTF-8 string: ${e}`);
-      }
-  }
+    @handlingRangeError
+    readString(): string {
+        const len = this.readU32();
+        const buf = this.readBuffer(len);
+        try {
+            // NOTE: Using TextDecoder to fail on invalid UTF-8
+            return textDecoder.decode(buf);
+        } catch (e) {
+            throw new BorshError(`Error decoding UTF-8 string: ${e}`);
+        }
+    }
 
-  @handlingRangeError
-  readFixedArray(len: number): Uint8Array {
-      return new Uint8Array(this.readBuffer(len));
-  }
+    @handlingRangeError
+    readFixedArray(len: number): Uint8Array {
+        return new Uint8Array(this.readBuffer(len));
+    }
 
-  @handlingRangeError
-  readArray(fn: any): any[] {
-      const len = this.readU32();
-      const result = Array<any>();
-      for (let i = 0; i < len; ++i) {
-          result.push(fn());
-      }
-      return result;
-  }
+    @handlingRangeError
+    readArray(fn: any): any[] {
+        const len = this.readU32();
+        const result = Array<any>();
+        for (let i = 0; i < len; ++i) {
+            result.push(fn());
+        }
+        return result;
+    }
 }
 
 function capitalizeFirstLetter(string) {
@@ -253,7 +253,7 @@ function serializeField(
     writer: any
 ) {
     try {
-    // TODO: Handle missing values properly (make sure they never result in just skipped write)
+        // TODO: Handle missing values properly (make sure they never result in just skipped write)
         if (typeof fieldType === 'string') {
             writer[`write${capitalizeFirstLetter(fieldType)}`](value);
         } else if (fieldType instanceof Array) {
@@ -280,25 +280,25 @@ function serializeField(
             }
         } else if (fieldType.kind !== undefined) {
             switch (fieldType.kind) {
-            case 'option': {
-                if (value === null || value === undefined) {
-                    writer.writeU8(0);
-                } else {
-                    writer.writeU8(1);
-                    serializeField(schema, fieldName, value, fieldType.type, writer);
+                case 'option': {
+                    if (value === null || value === undefined) {
+                        writer.writeU8(0);
+                    } else {
+                        writer.writeU8(1);
+                        serializeField(schema, fieldName, value, fieldType.type, writer);
+                    }
+                    break;
                 }
-                break;
-            }
-            case 'map': {
-                writer.writeU32(value.size);
-                value.forEach((val, key) => {
-                    serializeField(schema, fieldName, key, fieldType.key, writer);
-                    serializeField(schema, fieldName, val, fieldType.value, writer);
-                });
-                break;
-            }
-            default:
-                throw new BorshError(`FieldType ${fieldType} unrecognized`);
+                case 'map': {
+                    writer.writeU32(value.size);
+                    value.forEach((val, key) => {
+                        serializeField(schema, fieldName, key, fieldType.key, writer);
+                        serializeField(schema, fieldName, val, fieldType.value, writer);
+                    });
+                    break;
+                }
+                default:
+                    throw new BorshError(`FieldType ${fieldType} unrecognized`);
             }
         } else {
             serializeStruct(schema, value, writer);
@@ -450,7 +450,7 @@ function deserializeStruct(
 /// Deserializes object from bytes using schema.
 export function deserialize<T>(
     schema: Schema,
-    classType: { new (args: any): T },
+    classType: { new(args: any): T },
     buffer: Buffer,
     Reader = BinaryReader
 ): T {
@@ -458,8 +458,7 @@ export function deserialize<T>(
     const result = deserializeStruct(schema, classType, reader);
     if (reader.offset < buffer.length) {
         throw new BorshError(
-            `Unexpected ${
-                buffer.length - reader.offset
+            `Unexpected ${buffer.length - reader.offset
             } bytes after deserialized data`
         );
     }
@@ -469,7 +468,7 @@ export function deserialize<T>(
 /// Deserializes object from bytes using schema, without checking the length read
 export function deserializeUnchecked<T>(
     schema: Schema,
-    classType: { new (args: any): T },
+    classType: { new(args: any): T },
     buffer: Buffer,
     Reader = BinaryReader
 ): T {

@@ -37,13 +37,13 @@ test('serialize object', async () => {
 });
 
 test('serialize optional field', async () => {
-    const schema = new Map([[Test, { kind: 'struct', fields: [['x', { kind: 'option', type: 'string' }]]}]]);
+    const schema = new Map([[Test, { kind: 'struct', fields: [['x', { kind: 'option', type: 'string' }]] }]]);
 
     let buf = borsh.serialize(schema, new Test({ x: '123', }));
     let newValue = borsh.deserialize(schema, Test, buf);
     expect(newValue.x).toEqual('123');
 
-    buf = borsh.serialize(schema, new Test({ }));
+    buf = borsh.serialize(schema, new Test({}));
     newValue = borsh.deserialize(schema, Test, buf);
     expect(newValue.x).toEqual(undefined);
 });
@@ -175,7 +175,7 @@ test('serialize with custom writer/reader', async () => {
 
     const time = 'Aug 12, 2021 12:00:00 UTC+00:00';
     const value = new Test({ x: new Date(time) });
-    const schema = new Map([[Test, {kind: 'struct', fields: [['x', 'date']]}]]);
+    const schema = new Map([[Test, { kind: 'struct', fields: [['x', 'date']] }]]);
 
     const buf = borsh.serialize(schema, value, ExtendedWriter);
     const newValue = borsh.deserialize(schema, Test, buf, ExtendedReader);
@@ -188,7 +188,7 @@ test('serialize map', async () => {
         map.set(new BN(i * 10), 'some string ' + i.toString());
     }
     const value = new Test({ x: map });
-    const schema = new Map([[ Test, {
+    const schema = new Map([[Test, {
         kind: 'struct',
         fields: [
             ['x', { kind: 'map', key: 'u64', value: 'string' }],
