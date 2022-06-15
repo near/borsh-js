@@ -8,7 +8,7 @@ jobs:
             - uses: actions/setup-node@v2
               with:
                   node-version: '14'
-            - run: yarn install
+            - run: yarn
             - run: yarn test
     build:
         runs-on: ubuntu-latest
@@ -17,14 +17,14 @@ jobs:
             - uses: actions/setup-node@v2
               with:
                   node-version: '14'
-            - run: yarn install
+            - run: yarn
             - run: yarn build
-    prettier:
+    eslint:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
                   node-version: '14'
-            - run: yarn install
-            - run: yarn pretty:check
+            - run: yarn
+            - run: yarn lint
