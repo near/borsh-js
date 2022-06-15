@@ -1,5 +1,5 @@
-/// <reference types="node" />
 import BN from 'bn.js';
+import { Buffer } from 'buffer/';
 export declare function baseEncode(value: Uint8Array | string): string;
 export declare function baseDecode(value: string): Buffer;
 export declare type Schema = Map<Function, any>;
