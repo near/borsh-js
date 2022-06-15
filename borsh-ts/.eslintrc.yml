@@ -8,7 +8,8 @@ extends:
 parser: '@typescript-eslint/parser'
 rules:
   no-inner-declarations: 1
-  '@typescript-eslint/no-explicit-any': 0
+  '@typescript-eslint/no-explicit-any': 1
+  '@typescript-eslint/ban-types': 1
   '@typescript-eslint/explicit-function-return-type': 1
   '@typescript-eslint/no-use-before-define': 1
 
