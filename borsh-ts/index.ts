@@ -31,7 +31,7 @@ export class BorshError extends Error {
         this.originalMessage = message;
     }
 
-    addToFieldPath(fieldName: string) {
+    addToFieldPath(fieldName: string): void {
         this.fieldPath.splice(0, 0, fieldName);
         // NOTE: Modifying message directly as jest doesn't use .toString()
         this.message = this.originalMessage + ': ' + this.fieldPath.join('.');
@@ -48,51 +48,51 @@ export class BinaryWriter {
         this.length = 0;
     }
 
-    maybeResize() {
+    maybeResize(): void {
         if (this.buf.length < 16 + this.length) {
             this.buf = Buffer.concat([this.buf, Buffer.alloc(INITIAL_LENGTH)]);
         }
     }
 
-    public writeU8(value: number) {
+    public writeU8(value: number): void {
         this.maybeResize();
         this.buf.writeUInt8(value, this.length);
         this.length += 1;
     }
 
-    public writeU16(value: number) {
+    public writeU16(value: number): void {
         this.maybeResize();
         this.buf.writeUInt16LE(value, this.length);
         this.length += 2;
     }
 
-    public writeU32(value: number) {
+    public writeU32(value: number): void {
         this.maybeResize();
         this.buf.writeUInt32LE(value, this.length);
         this.length += 4;
     }
 
-    public writeU64(value: number | BN) {
+    public writeU64(value: number | BN): void {
         this.maybeResize();
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 8)));
     }
 
-    public writeU128(value: number | BN) {
+    public writeU128(value: number | BN): void {
         this.maybeResize();
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 16)));
     }
 
-    public writeU256(value: number | BN) {
+    public writeU256(value: number | BN): void {
         this.maybeResize();
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 32)));
     }
 
-    public writeU512(value: number | BN) {
+    public writeU512(value: number | BN): void {
         this.maybeResize();
         this.writeBuffer(Buffer.from(new BN(value).toArray('le', 64)));
     }
 
-    private writeBuffer(buffer: Buffer) {
+    private writeBuffer(buffer: Buffer): void {
         // Buffer.from is needed as this.buf.subarray can return plain Uint8Array in browser
         this.buf = Buffer.concat([
             Buffer.from(this.buf.subarray(0, this.length)),
@@ -102,18 +102,18 @@ export class BinaryWriter {
         this.length += buffer.length;
     }
 
-    public writeString(str: string) {
+    public writeString(str: string): void {
         this.maybeResize();
         const b = Buffer.from(str, 'utf8');
         this.writeU32(b.length);
         this.writeBuffer(b);
     }
 
-    public writeFixedArray(array: Uint8Array) {
+    public writeFixedArray(array: Uint8Array): void {
         this.writeBuffer(Buffer.from(array));
     }
 
-    public writeArray(array: any[], fn: any) {
+    public writeArray(array: any[], fn: any): void {
         this.maybeResize();
         this.writeU32(array.length);
         for (const elem of array) {
@@ -131,9 +131,9 @@ function handlingRangeError(
     target: any,
     propertyKey: string,
     propertyDescriptor: PropertyDescriptor
-) {
+): any {
     const originalMethod = propertyDescriptor.value;
-    propertyDescriptor.value = function (...args: any[]) {
+    propertyDescriptor.value = function (...args: any[]): any {
         try {
             return originalMethod.apply(this, args);
         } catch (e) {
@@ -241,7 +241,7 @@ export class BinaryReader {
     }
 }
 
-function capitalizeFirstLetter(string) {
+function capitalizeFirstLetter(string): string {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
@@ -251,7 +251,7 @@ function serializeField(
     value: any,
     fieldType: any,
     writer: any
-) {
+): void {
     try {
         // TODO: Handle missing values properly (make sure they never result in just skipped write)
         if (typeof fieldType === 'string') {
@@ -280,25 +280,25 @@ function serializeField(
             }
         } else if (fieldType.kind !== undefined) {
             switch (fieldType.kind) {
-                case 'option': {
-                    if (value === null || value === undefined) {
-                        writer.writeU8(0);
-                    } else {
-                        writer.writeU8(1);
-                        serializeField(schema, fieldName, value, fieldType.type, writer);
-                    }
-                    break;
+            case 'option': {
+                if (value === null || value === undefined) {
+                    writer.writeU8(0);
+                } else {
+                    writer.writeU8(1);
+                    serializeField(schema, fieldName, value, fieldType.type, writer);
                 }
-                case 'map': {
-                    writer.writeU32(value.size);
-                    value.forEach((val, key) => {
-                        serializeField(schema, fieldName, key, fieldType.key, writer);
-                        serializeField(schema, fieldName, val, fieldType.value, writer);
-                    });
-                    break;
-                }
-                default:
-                    throw new BorshError(`FieldType ${fieldType} unrecognized`);
+                break;
+            }
+            case 'map': {
+                writer.writeU32(value.size);
+                value.forEach((val, key) => {
+                    serializeField(schema, fieldName, key, fieldType.key, writer);
+                    serializeField(schema, fieldName, val, fieldType.value, writer);
+                });
+                break;
+            }
+            default:
+                throw new BorshError(`FieldType ${fieldType} unrecognized`);
             }
         } else {
             serializeStruct(schema, value, writer);
@@ -311,7 +311,7 @@ function serializeField(
     }
 }
 
-function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter) {
+function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter): void {
     if (typeof obj.borshSerialize === 'function') {
         obj.borshSerialize(writer);
         return;
@@ -414,7 +414,7 @@ function deserializeStruct(
     schema: Schema,
     classType: any,
     reader: BinaryReader
-) {
+): any {
     if (typeof classType.borshDeserialize === 'function') {
         return classType.borshDeserialize(reader);
     }
