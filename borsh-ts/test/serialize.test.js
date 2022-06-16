@@ -202,3 +202,8 @@ test('serialize map', async () => {
         expect(value).toEqual("some string " + (key.toNumber() / 10).toString());
     });
 });
+
+test('method chaining', async () => {
+    const value = new BN('340282366920938463463374607431768211455');
+    expect(new borsh.BinaryReader(new borsh.BinaryWriter().writeU128(value).toArray()).readU128().toString()).toEqual(value.toString());
+});
