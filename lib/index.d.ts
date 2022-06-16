@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import BN from "bn.js";
+import BN from 'bn.js';
 export declare function baseEncode(value: Uint8Array | string): string;
 export declare function baseDecode(value: string): Buffer;
 export declare type Schema = Map<Function, any>;
@@ -14,17 +14,17 @@ export declare class BinaryWriter {
     length: number;
     constructor();
     maybeResize(): void;
-    writeU8(value: number): void;
-    writeU16(value: number): void;
-    writeU32(value: number): void;
-    writeU64(value: number | BN): void;
-    writeU128(value: number | BN): void;
-    writeU256(value: number | BN): void;
-    writeU512(value: number | BN): void;
+    writeU8(value: number): BinaryWriter;
+    writeU16(value: number): BinaryWriter;
+    writeU32(value: number): BinaryWriter;
+    writeU64(value: number | BN): BinaryWriter;
+    writeU128(value: number | BN): BinaryWriter;
+    writeU256(value: number | BN): BinaryWriter;
+    writeU512(value: number | BN): BinaryWriter;
     private writeBuffer;
-    writeString(str: string): void;
-    writeFixedArray(array: Uint8Array): void;
-    writeArray(array: any[], fn: any): void;
+    writeString(str: string): BinaryWriter;
+    writeFixedArray(array: Uint8Array): BinaryWriter;
+    writeArray(array: any[], fn: any): BinaryWriter;
     toArray(): Uint8Array;
 }
 export declare class BinaryReader {
