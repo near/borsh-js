@@ -1,26 +1,26 @@
-"use strict";
+'use strict';
 var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+    return (mod && mod.__esModule) ? mod : { 'default': mod };
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const tweetnacl_1 = __importDefault(require("tweetnacl"));
-const serialize_1 = require("./serialize");
-const enums_1 = require("./enums");
+Object.defineProperty(exports, '__esModule', { value: true });
+const tweetnacl_1 = __importDefault(require('tweetnacl'));
+const serialize_1 = require('./serialize');
+const enums_1 = require('./enums');
 /** All supported key types */
 var KeyType;
 (function (KeyType) {
-    KeyType[KeyType["ED25519"] = 0] = "ED25519";
+    KeyType[KeyType['ED25519'] = 0] = 'ED25519';
 })(KeyType = exports.KeyType || (exports.KeyType = {}));
 function key_type_to_str(keyType) {
     switch (keyType) {
-        case KeyType.ED25519: return 'ed25519';
-        default: throw new Error(`Unknown key type ${keyType}`);
+    case KeyType.ED25519: return 'ed25519';
+    default: throw new Error(`Unknown key type ${keyType}`);
     }
 }
 function str_to_key_type(keyType) {
     switch (keyType.toLowerCase()) {
-        case 'ed25519': return KeyType.ED25519;
-        default: throw new Error(`Unknown key type ${keyType}`);
+    case 'ed25519': return KeyType.ED25519;
+    default: throw new Error(`Unknown key type ${keyType}`);
     }
 }
 /**
@@ -57,8 +57,8 @@ class KeyPair {
      */
     static fromRandom(curve) {
         switch (curve.toUpperCase()) {
-            case 'ED25519': return KeyPairEd25519.fromRandom();
-            default: throw new Error(`Unknown curve ${curve}`);
+        case 'ED25519': return KeyPairEd25519.fromRandom();
+        default: throw new Error(`Unknown curve ${curve}`);
         }
     }
     static fromString(encodedKey) {
@@ -68,8 +68,8 @@ class KeyPair {
         }
         else if (parts.length === 2) {
             switch (parts[0].toUpperCase()) {
-                case 'ED25519': return new KeyPairEd25519(parts[1]);
-                default: throw new Error(`Unknown curve: ${parts[0]}`);
+            case 'ED25519': return new KeyPairEd25519(parts[1]);
+            default: throw new Error(`Unknown curve: ${parts[0]}`);
             }
         }
         else {
