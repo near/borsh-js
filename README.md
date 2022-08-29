@@ -33,10 +33,10 @@ const newValue = borsh.deserialize(schema, Test, buffer);
 | `u8` integer          | `number`       |
 | `u16` integer         | `number`       |
 | `u32` integer         | `number`       |
-| `u64` integer         | `BN`           |
-| `u128` integer        | `BN`           |
-| `u256` integer        | `BN`           |
-| `u512` integer        | `BN`           |
+| `u64` integer         | `bigint`       |
+| `u128` integer        | `bigint`       |
+| `u256` integer        | `bigint`       |
+| `u512` integer        | `bigint`       |
 | `f32` float           | N/A            |
 | `f64` float           | N/A            |
 | fixed-size byte array | `Uint8Array`   |
