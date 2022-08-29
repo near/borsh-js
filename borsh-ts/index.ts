@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import type BN from 'bn.js';
 import bs58 from 'bs58';
 
 // TODO: Make sure this polyfill not included when not required
@@ -16,6 +16,22 @@ export function baseEncode(value: Uint8Array | string): string {
 
 export function baseDecode(value: string): Buffer {
     return Buffer.from(bs58.decode(value));
+}
+
+function getLEByteBufferFromNumber(
+    n: bigint | number,
+    byteLength: number,
+): Buffer {
+    let hex = n.toString(16);
+    if (hex.length % 2) {
+        hex = '0' + hex;
+    }
+    const bytes = new Uint8Array(byteLength);
+    hex
+        .match(/../g)
+        .reverse()
+        .forEach((s, i) => { bytes[i] = parseInt(s, 16); });
+    return Buffer.from(bytes);
 }
 
 const INITIAL_LENGTH = 1024;
@@ -72,24 +88,29 @@ export class BinaryWriter {
         this.length += 4;
     }
 
-    public writeU64(value: number | BN): void {
+    private writeBigInteger(value: number | bigint | BN, bytes: 8 | 16 | 32 | 64): void {
         this.maybeResize();
-        this.writeBuffer(Buffer.from(new BN(value).toArray('le', 8)));
+        this.writeBuffer(
+            typeof value === 'object'
+                ? value.toBuffer('le', bytes)
+                : getLEByteBufferFromNumber(value, bytes)
+        );
     }
 
-    public writeU128(value: number | BN): void {
-        this.maybeResize();
-        this.writeBuffer(Buffer.from(new BN(value).toArray('le', 16)));
+    public writeU64(value: number | bigint | BN): void {
+        this.writeBigInteger(value, 8);
     }
 
-    public writeU256(value: number | BN): void {
-        this.maybeResize();
-        this.writeBuffer(Buffer.from(new BN(value).toArray('le', 32)));
+    public writeU128(value: number | bigint | BN): void {
+        this.writeBigInteger(value, 16);
     }
 
-    public writeU512(value: number | BN): void {
-        this.maybeResize();
-        this.writeBuffer(Buffer.from(new BN(value).toArray('le', 64)));
+    public writeU256(value: number | bigint | BN): void {
+        this.writeBigInteger(value, 32);
+    }
+
+    public writeU512(value: number | bigint | BN): void {
+        this.writeBigInteger(value, 64);
     }
 
     private writeBuffer(buffer: Buffer): void {
@@ -180,28 +201,34 @@ export class BinaryReader {
         return value;
     }
 
-    @handlingRangeError
-    readU64(): BN {
-        const buf = this.readBuffer(8);
-        return new BN(buf, 'le');
+    private readBigInteger(bytes: 8 | 16 | 32 | 64): bigint {
+        const buf = this.readBuffer(bytes);
+        let ret = 0n;
+        for (let ii = 1; ii <= bytes; ii++) {
+            const byte = buf[bytes - ii];
+            ret = (ret << 8n) + BigInt(byte);
+        }
+        return ret;
     }
 
     @handlingRangeError
-    readU128(): BN {
-        const buf = this.readBuffer(16);
-        return new BN(buf, 'le');
+    readU64(): bigint {
+        return this.readBigInteger(8);
     }
 
     @handlingRangeError
-    readU256(): BN {
-        const buf = this.readBuffer(32);
-        return new BN(buf, 'le');
+    readU128(): bigint {
+        return this.readBigInteger(16);
     }
 
     @handlingRangeError
-    readU512(): BN {
-        const buf = this.readBuffer(64);
-        return new BN(buf, 'le');
+    readU256(): bigint {
+        return this.readBigInteger(32);
+    }
+
+    @handlingRangeError
+    readU512(): bigint {
+        return this.readBigInteger(64);
     }
 
     private readBuffer(len: number): Buffer {

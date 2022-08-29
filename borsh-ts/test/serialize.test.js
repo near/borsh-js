@@ -48,9 +48,9 @@ test('serialize optional field', async () => {
     expect(newValue.x).toEqual(undefined);
 });
 
-test('serialize max uint', async () => {
-    const u64MaxHex = 'ffffffffffffffff';
-    const value = new Test({
+const u64MaxHex = 'ffffffffffffffff';
+[
+    ['BN', new Test({
         x: 255,
         y: 65535,
         z: 4294967295,
@@ -58,28 +58,40 @@ test('serialize max uint', async () => {
         r: new BN(u64MaxHex.repeat(2), 16),
         s: new BN(u64MaxHex.repeat(4), 16),
         t: new BN(u64MaxHex.repeat(8), 16)
+    })],
+    ['bigint', new Test({
+        x: 255,
+        y: 65535,
+        z: 4294967295,
+        q: global.BigInt('0x' + u64MaxHex),
+        r: global.BigInt('0x' + u64MaxHex.repeat(2)),
+        s: global.BigInt('0x' + u64MaxHex.repeat(4)),
+        t: global.BigInt('0x' + u64MaxHex.repeat(8)),
+    })]
+].forEach(([kind, value]) => {
+    test('serialize max uint of `' + kind + '`', async () => {
+        const schema = new Map([[Test, {
+            kind: 'struct',
+            fields: [
+                ['x', 'u8'],
+                ['y', 'u16'],
+                ['z', 'u32'],
+                ['q', 'u64'],
+                ['r', 'u128'],
+                ['s', 'u256'],
+                ['t', 'u512']
+            ]
+        }]]);
+        const buf = borsh.serialize(schema, value);
+        const newValue = borsh.deserialize(schema, Test, buf);
+        expect(newValue.x).toEqual(255);
+        expect(newValue.y).toEqual(65535);
+        expect(newValue.z).toEqual(4294967295);
+        expect(newValue.q.toString()).toEqual('18446744073709551615');
+        expect(newValue.r.toString()).toEqual('340282366920938463463374607431768211455');
+        expect(newValue.s.toString()).toEqual('115792089237316195423570985008687907853269984665640564039457584007913129639935');
+        expect(newValue.t.toString()).toEqual('13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095');
     });
-    const schema = new Map([[Test, {
-        kind: 'struct',
-        fields: [
-            ['x', 'u8'],
-            ['y', 'u16'],
-            ['z', 'u32'],
-            ['q', 'u64'],
-            ['r', 'u128'],
-            ['s', 'u256'],
-            ['t', 'u512']
-        ]
-    }]]);
-    const buf = borsh.serialize(schema, value);
-    const newValue = borsh.deserialize(schema, Test, buf);
-    expect(newValue.x).toEqual(255);
-    expect(newValue.y).toEqual(65535);
-    expect(newValue.z).toEqual(4294967295);
-    expect(newValue.q.toString()).toEqual('18446744073709551615');
-    expect(newValue.r.toString()).toEqual('340282366920938463463374607431768211455');
-    expect(newValue.s.toString()).toEqual('115792089237316195423570985008687907853269984665640564039457584007913129639935');
-    expect(newValue.t.toString()).toEqual('13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095');
 });
 
 test('serialize/deserialize with class methods', () => {
@@ -169,7 +181,7 @@ test('serialize with custom writer/reader', async () => {
     class ExtendedReader extends borsh.BinaryReader {
         readDate() {
             const value = this.readU64();
-            return new Date(value.toNumber());
+            return new Date(Number(value));
         }
     }
 
@@ -182,23 +194,28 @@ test('serialize with custom writer/reader', async () => {
     expect(newValue.x).toEqual(new Date(time));
 });
 
-test('serialize map', async () => {
-    let map = new Map();
-    for (let i = 0; i < 10; i++) {
-        map.set(new BN(i * 10), 'some string ' + i.toString());
-    }
-    const value = new Test({ x: map });
-    const schema = new Map([[Test, {
-        kind: 'struct',
-        fields: [
-            ['x', { kind: 'map', key: 'u64', value: 'string' }],
-        ],
-    }]]);
+[
+    ['BN', n => new BN(n * 10)],
+    ['bigint', n => global.BigInt(n) * 10n],
+].forEach(([kind, getValue]) => {
+    test('serialize map of `' + kind + '`', async () => {
+        let map = new Map();
+        for (let i = 0; i < 10; i++) {
+            map.set(getValue(i), 'some string ' + i.toString());
+        }
+        const value = new Test({ x: map });
+        const schema = new Map([[Test, {
+            kind: 'struct',
+            fields: [
+                ['x', { kind: 'map', key: 'u64', value: 'string' }],
+            ],
+        }]]);
 
-    const buf = borsh.serialize(schema, value);
-    const deserialized = borsh.deserialize(schema, Test, buf);
-    expect(deserialized.x.size).toEqual(10);
-    deserialized.x.forEach((value, key) => {
-        expect(value).toEqual('some string ' + (key.toNumber() / 10).toString());
+        const buf = borsh.serialize(schema, value);
+        const deserialized = borsh.deserialize(schema, Test, buf);
+        expect(deserialized.x.size).toEqual(10);
+        deserialized.x.forEach((value, key) => {
+            expect(value).toEqual('some string ' + (Number(key) / 10).toString());
+        });
     });
 });
