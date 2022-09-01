@@ -1,4 +1,4 @@
-import {toBufferLE} from 'bigint-buffer';
+import {toBigIntLE, toBufferLE} from 'bigint-buffer';
 import type BN from 'bn.js';
 import bs58 from 'bs58';
 
@@ -194,12 +194,7 @@ export class BinaryReader {
 
     private readBigInteger(bytes: 8 | 16 | 32 | 64): bigint {
         const buf = this.readBuffer(bytes);
-        let ret = 0n;
-        for (let ii = 1; ii <= bytes; ii++) {
-            const byte = buf[bytes - ii];
-            ret = (ret << 8n) + BigInt(byte);
-        }
-        return ret;
+        return toBigIntLE(buf);
     }
 
     @handlingRangeError
