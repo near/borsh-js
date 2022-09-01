@@ -1,3 +1,4 @@
+import {toBufferLE} from 'bigint-buffer';
 import type BN from 'bn.js';
 import bs58 from 'bs58';
 
@@ -16,22 +17,6 @@ export function baseEncode(value: Uint8Array | string): string {
 
 export function baseDecode(value: string): Buffer {
     return Buffer.from(bs58.decode(value));
-}
-
-function getLEByteBufferFromNumber(
-    n: bigint | number,
-    byteLength: number,
-): Buffer {
-    let hex = n.toString(16);
-    if (hex.length % 2) {
-        hex = '0' + hex;
-    }
-    const bytes = new Uint8Array(byteLength);
-    hex
-        .match(/../g)
-        .reverse()
-        .forEach((s, i) => { bytes[i] = parseInt(s, 16); });
-    return Buffer.from(bytes);
 }
 
 const INITIAL_LENGTH = 1024;
@@ -90,11 +75,17 @@ export class BinaryWriter {
 
     private writeBigInteger(value: number | bigint | BN, bytes: 8 | 16 | 32 | 64): void {
         this.maybeResize();
-        this.writeBuffer(
-            typeof value === 'object'
-                ? value.toBuffer('le', bytes)
-                : getLEByteBufferFromNumber(value, bytes)
-        );
+        let buffer: Buffer;
+        if (typeof value === 'object') {
+            // By process of elimination, `value` is an instance of `BN`.
+            buffer = value.toBuffer('le', bytes);
+        } else {
+            if (typeof value === 'number') {
+                value = BigInt(value);
+            }
+            buffer = toBufferLE(value, bytes);
+        }
+        this.writeBuffer(buffer);
     }
 
     public writeU64(value: number | bigint | BN): void {
