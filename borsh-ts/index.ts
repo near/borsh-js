@@ -409,9 +409,9 @@ function deserializeStruct(
     schema: ObjectSchema,
     reader: BinaryReader
 ): any {
-    // if (typeof classType.borshDeserialize === 'function') {
-    //     return classType.borshDeserialize(reader);
-    // }
+    if (typeof schema.borshDeserialize === 'function') {
+        return schema.borshDeserialize(reader);
+    }
 
     const structSchema = schema;
 

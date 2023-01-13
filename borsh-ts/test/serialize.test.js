@@ -1,16 +1,6 @@
 const borsh = require('../../lib/index');
 const BN = require('bn.js');
 
-class Assignable {
-    constructor(properties) {
-        Object.keys(properties).map((key) => {
-            this[key] = properties[key];
-        });
-    }
-}
-
-class Test extends Assignable { }
-
 class Serializable {
     constructor(data) {
         this.data = data;
@@ -86,14 +76,14 @@ test('serialize max uint', async () => {
     expect(newValue.t.toString()).toEqual('13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095');
 });
 
-// test('serialize/deserialize with class methods', () => {
-//     const item = new Serializable(10);
+test('serialize/deserialize with class methods', () => {
+    const item = new Serializable(10);
 
-//     const buf = borsh.serialize(null, item);
-//     const newValue = borsh.deserialize(null, Serializable, buf);
+    const buf = borsh.serialize(null, item);
+    const newValue = borsh.deserialize(Serializable, buf);
 
-//     expect(newValue).toEqual(item);
-// });
+    expect(newValue).toEqual(item);
+});
 
 test('serialize/deserialize fixed array', () => {
     const value = {
