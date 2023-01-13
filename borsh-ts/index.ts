@@ -417,10 +417,10 @@ function deserializeStruct(
 
     if (structSchema.enum) {
         const idx = reader.readU8();
-        if (idx >= structSchema.values.length) {
+        const keys = Object.keys(structSchema);
+        if (idx >= keys.length - 1) {
             throw new BorshError(`Enum index: ${idx} is out of range`);
         }
-        const keys = Object.keys(structSchema);
         const fieldName = keys[idx + 1];
         if (!fieldName) {
             throw new BorshError(`Enum index: ${idx} is out of range, enum schema has only these fields ${keys}`);
