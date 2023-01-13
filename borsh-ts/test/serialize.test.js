@@ -26,10 +26,15 @@ class Serializable {
 }
 
 test('serialize object', async () => {
-    const value = new Test({ x: 255, y: 20, z: '123', q: [1, 2, 3] });
-    const schema = new Map([[Test, { kind: 'struct', fields: [['x', 'u8'], ['y', 'u64'], ['z', 'string'], ['q', [3]]] }]]);
+    const value = { x: 255, y: 20, z: '123', q: [1, 2, 3] };
+    const schema = {
+        x: 'u8', 
+        y: 'u64',
+        z: 'string', 
+        q: [3]
+    };
     const buf = borsh.serialize(schema, value);
-    const newValue = borsh.deserialize(schema, Test, buf);
+    const newValue = borsh.deserialize(schema, buf);
     expect(newValue.x).toEqual(255);
     expect(newValue.y.toString()).toEqual('20');
     expect(newValue.z).toEqual('123');
@@ -37,20 +42,22 @@ test('serialize object', async () => {
 });
 
 test('serialize optional field', async () => {
-    const schema = new Map([[Test, { kind: 'struct', fields: [['x', { kind: 'option', type: 'string' }]] }]]);
+    const schema = {
+        x: { kind: 'option', type: 'string' }
+    };
 
-    let buf = borsh.serialize(schema, new Test({ x: '123', }));
-    let newValue = borsh.deserialize(schema, Test, buf);
+    let buf = borsh.serialize(schema, { x: '123', });
+    let newValue = borsh.deserialize(schema, buf);
     expect(newValue.x).toEqual('123');
 
-    buf = borsh.serialize(schema, new Test({}));
-    newValue = borsh.deserialize(schema, Test, buf);
+    buf = borsh.serialize(schema, {});
+    newValue = borsh.deserialize(schema,buf);
     expect(newValue.x).toEqual(undefined);
 });
 
 test('serialize max uint', async () => {
     const u64MaxHex = 'ffffffffffffffff';
-    const value = new Test({
+    const value = {
         x: 255,
         y: 65535,
         z: 4294967295,
@@ -58,21 +65,18 @@ test('serialize max uint', async () => {
         r: new BN(u64MaxHex.repeat(2), 16),
         s: new BN(u64MaxHex.repeat(4), 16),
         t: new BN(u64MaxHex.repeat(8), 16)
-    });
-    const schema = new Map([[Test, {
-        kind: 'struct',
-        fields: [
-            ['x', 'u8'],
-            ['y', 'u16'],
-            ['z', 'u32'],
-            ['q', 'u64'],
-            ['r', 'u128'],
-            ['s', 'u256'],
-            ['t', 'u512']
-        ]
-    }]]);
+    };
+    const schema = {
+        x: 'u8',
+        y: 'u16',
+        z: 'u32',
+        q: 'u64',
+        r: 'u128',
+        s: 'u256',
+        t: 'u512',
+    };
     const buf = borsh.serialize(schema, value);
-    const newValue = borsh.deserialize(schema, Test, buf);
+    const newValue = borsh.deserialize(schema, buf);
     expect(newValue.x).toEqual(255);
     expect(newValue.y).toEqual(65535);
     expect(newValue.z).toEqual(4294967295);
@@ -82,57 +86,49 @@ test('serialize max uint', async () => {
     expect(newValue.t.toString()).toEqual('13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006084095');
 });
 
-test('serialize/deserialize with class methods', () => {
-    const item = new Serializable(10);
+// test('serialize/deserialize with class methods', () => {
+//     const item = new Serializable(10);
 
-    const buf = borsh.serialize(null, item);
-    const newValue = borsh.deserialize(null, Serializable, buf);
+//     const buf = borsh.serialize(null, item);
+//     const newValue = borsh.deserialize(null, Serializable, buf);
 
-    expect(newValue).toEqual(item);
-});
+//     expect(newValue).toEqual(item);
+// });
 
 test('serialize/deserialize fixed array', () => {
-    const value = new Test({
+    const value = {
         a: ['hello', 'world']
-    });
-    const schema = new Map([[Test, {
-        kind: 'struct',
-        fields: [
-            ['a', ['string', 2]]
-        ]
-    }]]);
+    };
+
+    const schema = {
+        a: ['string', 2]
+    }
 
     const buf = borsh.serialize(schema, value);
-    const deserializedValue = borsh.deserialize(schema, Test, buf);
+    const deserializedValue = borsh.deserialize(schema, buf);
 
     expect(buf).toEqual(Buffer.from([5, 0, 0, 0, 104, 101, 108, 108, 111, 5, 0, 0, 0, 119, 111, 114, 108, 100]));
     expect(deserializedValue.a).toEqual(['hello', 'world']);
 });
 
 test('errors serializing fixed array of wrong size', () => {
-    const value = new Test({
+    const value = {
         a: ['hello', 'world', 'you']
-    });
-    const schema = new Map([[Test, {
-        kind: 'struct',
-        fields: [
-            ['a', ['string', 2]]
-        ]
-    }]]);
+    };
+    const schema = {
+        a: ['string', 2]
+    };
 
-    expect(() => borsh.serialize(schema, value)).toThrow('Expecting byte array of length 2, but got 3 bytes');
+    expect(() => borsh.serialize(schema, value)).toThrow('Expecting array of length 2, but got 3 items');
 });
 
 test('errors serializing fixed array of wrong type', () => {
-    const value = new Test({
+    const value = {
         a: [244, 34]
-    });
-    const schema = new Map([[Test, {
-        kind: 'struct',
-        fields: [
-            ['a', ['string', 2]]
-        ]
-    }]]);
+    };
+    const schema = {
+        a: ['string', 2],
+    };
 
     expect(() => borsh.serialize(schema, value)).toThrow('The first argument must be of type string');
 });
@@ -174,11 +170,13 @@ test('serialize with custom writer/reader', async () => {
     }
 
     const time = 'Aug 12, 2021 12:00:00 UTC+00:00';
-    const value = new Test({ x: new Date(time) });
-    const schema = new Map([[Test, { kind: 'struct', fields: [['x', 'date']] }]]);
+    const value = { x: new Date(time) };
+    const schema = {
+        x: 'date'
+    };
 
     const buf = borsh.serialize(schema, value, ExtendedWriter);
-    const newValue = borsh.deserialize(schema, Test, buf, ExtendedReader);
+    const newValue = borsh.deserialize(schema, buf, ExtendedReader);
     expect(newValue.x).toEqual(new Date(time));
 });
 
@@ -187,16 +185,13 @@ test('serialize map', async () => {
     for (let i = 0; i < 10; i++) {
         map.set(new BN(i * 10), 'some string ' + i.toString());
     }
-    const value = new Test({ x: map });
-    const schema = new Map([[Test, {
-        kind: 'struct',
-        fields: [
-            ['x', { kind: 'map', key: 'u64', value: 'string' }],
-        ],
-    }]]);
+    const value = { x: map };
+    const schema = {
+        x: { kind: 'map', key: 'u64', value: 'string' }
+    };
 
     const buf = borsh.serialize(schema, value);
-    const deserialized = borsh.deserialize(schema, Test, buf);
+    const deserialized = borsh.deserialize(schema, buf);
     expect(deserialized.x.size).toEqual(10);
     deserialized.x.forEach((value, key) => {
         expect(value).toEqual('some string ' + (key.toNumber() / 10).toString());

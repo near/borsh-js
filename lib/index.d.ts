@@ -2,7 +2,10 @@
 import BN from 'bn.js';
 export declare function baseEncode(value: Uint8Array | string): string;
 export declare function baseDecode(value: string): Buffer;
-export declare type Schema = Map<Function, any>;
+export type ValueSchema = any;
+export type ObjectSchema = {
+    [key: string]: ObjectSchema | ValueSchema;
+};
 export declare class BorshError extends Error {
     originalMessage: string;
     fieldPath: string[];
@@ -43,10 +46,6 @@ export declare class BinaryReader {
     readFixedArray(len: number): Uint8Array;
     readArray(fn: any): any[];
 }
-export declare function serialize(schema: Schema, obj: any, Writer?: typeof BinaryWriter): Uint8Array;
-export declare function deserialize<T>(schema: Schema, classType: {
-    new (args: any): T;
-}, buffer: Buffer, Reader?: typeof BinaryReader): T;
-export declare function deserializeUnchecked<T>(schema: Schema, classType: {
-    new (args: any): T;
-}, buffer: Buffer, Reader?: typeof BinaryReader): T;
+export declare function serialize(schema: ObjectSchema, obj: any, Writer?: typeof BinaryWriter): Uint8Array;
+export declare function deserialize<T>(schema: ObjectSchema, buffer: Buffer, Reader?: typeof BinaryReader): T;
+export declare function deserializeUnchecked<T>(schema: ObjectSchema, buffer: Buffer, Reader?: typeof BinaryReader): T;
