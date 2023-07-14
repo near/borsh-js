@@ -317,14 +317,7 @@ function serializeStruct(schema: Schema, obj: any, writer: BinaryWriter): void {
         return;
     }
 
-    let structSchema = undefined;
-    for (const key of schema.keys()){
-        if (key.name == obj.constructor.name) {
-            structSchema = schema.get(key);
-            break;
-        }
-    }
-
+const structSchema = schema.get(schema.keys().find((classConstructor) => (classConstructor.name === obj.constructor.name)));
     if (!structSchema) {
         throw new BorshError(`Class ${obj.constructor.name} is missing in schema`);
     }
