@@ -2,7 +2,7 @@
 import BN from 'bn.js';
 export declare function baseEncode(value: Uint8Array | string): string;
 export declare function baseDecode(value: string): Buffer;
-export type Schema = Map<Function, any>;
+export declare type Schema = Map<Function, any>;
 export declare class BorshError extends Error {
     originalMessage: string;
     fieldPath: string[];
