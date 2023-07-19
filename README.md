@@ -28,23 +28,20 @@ const newValue = borsh.deserialize(schema, Test, buffer);
 
 ## Type Mappings
 
-| Borsh                 | TypeScript     |
-|-----------------------|----------------|
-| `u8` integer          | `number`       |
-| `u16` integer         | `number`       |
-| `u32` integer         | `number`       |
-| `u64` integer         | `BN`           |
-| `u128` integer        | `BN`           |
-| `u256` integer        | `BN`           |
-| `u512` integer        | `BN`           |
-| `f32` float           | N/A            |
-| `f64` float           | N/A            |
-| fixed-size byte array | `Uint8Array`   |
-| UTF-8 string          | `string`       |
-| option                | `null` or type |
-| map                   | N/A            |
-| set                   | N/A            |
-| structs               | `any`          |
+| Borsh                             | TypeScript     |
+|-----------------------------------|----------------|
+| `u8` `u16` `u32` `i8` `i16` `i32` | `number`       |
+| `u64` `u128` `i64` `i128`         | `bignum`       |
+| `f32` `f64`                       | `number`       |
+| `f32` `f64`                       | `number`       |
+| `bool`                            | `boolean`      |
+| UTF-8 string                      | `string`       |
+| fixed-size byte array             | `Array`        |
+| dynamic sized array               | `Array`        |
+| enum                              | N/A            |
+| HashMap                           | `Map`          |
+| HashSet                           | `Set`          |
+| Option                            | `null` or type |
 
 ## Contributing
 
