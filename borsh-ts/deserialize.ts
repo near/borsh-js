@@ -80,7 +80,7 @@ export class BorshDeserializer {
 
     decode_array(schema: ArrayType): Array<any> {
         const result = [];
-        const len = schema.array.len? schema.array.len : this.decode_integer('u32') as number;
+        const len = schema.array.len ? schema.array.len : this.decode_integer('u32') as number;
 
         for (let i = 0; i < len; ++i) {
             result.push(this.decode(schema.array.type));
@@ -114,6 +114,6 @@ export class BorshDeserializer {
         for (const key in schema.struct) {
             result[key] = this.decode(schema.struct[key]);
         }
-        return classType? new classType(result) : result;
+        return classType ? new classType(result) : result;
     }
 }

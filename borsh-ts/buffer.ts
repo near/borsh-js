@@ -109,7 +109,7 @@ export class DecodeBuffer {
             throw new Error(`Unsupported integer type: ${type}`);
         }
         this.offset += size;
-        return ret;   
+        return ret;
     }
 
     consume_bytes(size: number): ArrayBuffer {

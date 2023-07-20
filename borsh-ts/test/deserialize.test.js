@@ -7,9 +7,9 @@ function check_decode(expected, schema, buffer, classType) {
     if (expected && typeof (expected) === 'object' && 'eq' in expected) {
         expect(expected.eq(decoded)).toBe(true);
     } else {
-        if(schema === 'f32'){
+        if (schema === 'f32') {
             expect(decoded).toBeCloseTo(expected);
-        }else{
+        } else {
             expect(decoded).toEqual(expected);
         }
     }

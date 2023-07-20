@@ -41,7 +41,7 @@ test('serialize arrays', async () => {
     check_encode(new ArrayBuffer(2), { array: { type: 'u8' } }, [2, 0, 0, 0, 0, 0]);
 
     const buffer = new ArrayBuffer(2);
-    new Uint8Array(buffer).set([1,2]);
+    new Uint8Array(buffer).set([1, 2]);
     check_encode(buffer, { array: { type: 'u8', len: 2 } }, [1, 2]);
 });
 
