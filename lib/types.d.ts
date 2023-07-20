@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 export declare const numbers: string[];
 export type NumberType = typeof numbers[number];
 export type BoolType = 'bool';
@@ -26,3 +27,4 @@ export type StructType = {
     };
 };
 export type Schema = NumberType | StringType | ArrayType | SetType | MapType | StructType;
+export type DecodeTypes = number | BN | string | boolean | Array<any> | ArrayBuffer | Map<any, any> | Set<any> | object | null;

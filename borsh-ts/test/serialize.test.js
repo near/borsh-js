@@ -39,7 +39,10 @@ test('serialize arrays', async () => {
     check_encode([true, false], { array: { type: 'bool' } }, [2, 0, 0, 0, 1, 0]);
     check_encode([true, false], { array: { type: 'bool', len: 2 } }, [1, 0]);
     check_encode(new ArrayBuffer(2), { array: { type: 'u8' } }, [2, 0, 0, 0, 0, 0]);
-    check_encode(new ArrayBuffer(2), { array: { type: 'u8', len: 2 } }, [0, 0]);
+
+    const buffer = new ArrayBuffer(2);
+    new Uint8Array(buffer).set([1,2]);
+    check_encode(buffer, { array: { type: 'u8', len: 2 } }, [1, 2]);
 });
 
 test('serialize options', async () => {
@@ -65,13 +68,12 @@ test('serialize struct', async () => {
     const numbers = new Numbers();
     const schema = {
         struct: {
-            u8: 'u8', u16: 'u16', u32: 'u32', u64: 'u64', u128: 'u128', i8: 'i8', i16: 'i16', i32: 'i32', i64: 'i64', i128: 'i128', f32: 'f32', f64: 'f64'
+            u8: 'u8', u16: 'u16', u32: 'u32', u64: 'u64', u128: 'u128', i8: 'i8', i16: 'i16', i32: 'i32', i64: 'i64', f32: 'f32', f64: 'f64'
         }
     };
     check_encode(numbers, schema, [1, 2, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 254, 255, 253, 255, 255, 255, 252, 255, 255, 255, 255, 255, 255, 255, 0, 0, 192, 64, 102, 102, 102, 102, 102, 102, 28, 64]);
 
 });
-
 
 
 // Aux structures

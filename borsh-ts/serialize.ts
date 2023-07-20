@@ -3,7 +3,6 @@ import { EncodeBuffer } from './buffer';
 import BN from 'bn.js';
 import * as utils from './utils';
 
-
 export class BorshSerializer {
     encoded: EncodeBuffer = new EncodeBuffer();
 
@@ -16,11 +15,12 @@ export class BorshSerializer {
 
         if (typeof schema === 'object') {
             if ('option' in schema) this.encode_option(value, schema as OptionType);
-            if ('array' in schema) this.encode_array(value, schema);
+            if ('array' in schema) this.encode_array(value, schema as ArrayType);
             if ('set' in schema) this.encode_set(value, schema as SetType);
             if ('map' in schema) this.encode_map(value, schema as MapType);
             if ('struct' in schema) this.encode_struct(value, schema as StructType);
         }
+
         return this.encoded.get_used_buffer();
     }
 
@@ -80,10 +80,9 @@ export class BorshSerializer {
         }
     }
 
-    encode_array(value: unknown, schema: Schema): void {
-        const _schema = schema as ArrayType;
-        if (utils.isArrayLike(value)) return this.encode_arraylike(value as ArrayLike<unknown>, _schema);
-        if (value instanceof ArrayBuffer) return this.encode_buffer(value, _schema);
+    encode_array(value: unknown, schema: ArrayType): void {
+        if (utils.isArrayLike(value)) return this.encode_arraylike(value as ArrayLike<unknown>, schema);
+        if (value instanceof ArrayBuffer) return this.encode_buffer(value, schema);
         throw new Error(`Expected Array-like not ${typeof (value)}(${value})`);
     }
 

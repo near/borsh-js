@@ -64,6 +64,60 @@ export class EncodeBuffer {
     }
 }
 
+export class DecodeBuffer {
+    offset = 0;
+    buffer_size = 256;
+    buffer: ArrayBuffer;
+    view: DataView;
+
+    constructor(buf: Uint8Array) {
+        this.buffer = new ArrayBuffer(buf.length);
+        new Uint8Array(this.buffer).set(buf);
+        this.view = new DataView(this.buffer);
+    }
+
+    consume_value(type: NumberType): number {
+        const size = parseInt(type.substring(1)) / 8;
+        let ret: number;
+
+        switch (type) {
+        case 'u8':
+            ret = this.view.getUint8(this.offset);
+            break;
+        case 'u16':
+            ret = this.view.getUint16(this.offset, true);
+            break;
+        case 'u32':
+            ret = this.view.getUint32(this.offset, true);
+            break;
+        case 'i8':
+            ret = this.view.getInt8(this.offset);
+            break;
+        case 'i16':
+            ret = this.view.getInt16(this.offset, true);
+            break;
+        case 'i32':
+            ret = this.view.getInt32(this.offset, true);
+            break;
+        case 'f32':
+            ret = this.view.getFloat32(this.offset, true);
+            break;
+        case 'f64':
+            ret = this.view.getFloat64(this.offset, true);
+            break;
+        default:
+            throw new Error(`Unsupported integer type: ${type}`);
+        }
+        this.offset += size;
+        return ret;   
+    }
+
+    consume_bytes(size: number): ArrayBuffer {
+        const ret = this.buffer.slice(this.offset, this.offset + size);
+        this.offset += size;
+        return ret;
+    }
+}
 // export class DecodeBuffer {
 //     public offset: number = 0;
 //     public start: usize;

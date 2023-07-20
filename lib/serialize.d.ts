@@ -9,7 +9,7 @@ export declare class BorshSerializer {
     encode_string(value: unknown): void;
     encode_boolean(value: unknown): void;
     encode_option(value: unknown, schema: OptionType): void;
-    encode_array(value: unknown, schema: Schema): void;
+    encode_array(value: unknown, schema: ArrayType): void;
     encode_arraylike(value: ArrayLike<unknown>, schema: ArrayType): void;
     encode_buffer(value: ArrayBuffer, schema: ArrayType): void;
     encode_set(value: unknown, schema: SetType): void;

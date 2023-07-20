@@ -9,3 +9,12 @@ export declare class EncodeBuffer {
     store_value(value: number, type: NumberType): void;
     store_bytes(from: Uint8Array): void;
 }
+export declare class DecodeBuffer {
+    offset: number;
+    buffer_size: number;
+    buffer: ArrayBuffer;
+    view: DataView;
+    constructor(buf: Uint8Array);
+    consume_value(type: NumberType): number;
+    consume_bytes(size: number): ArrayBuffer;
+}
