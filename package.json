@@ -46,6 +46,7 @@
     "typescript": "^4"
   },
   "dependencies": {
-    "bn.js": "^5.2.0"
+    "bn.js": "^5.2.0",
+    "bs58": "^4.0.0"
   }
 }
