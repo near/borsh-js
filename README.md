@@ -51,23 +51,6 @@ const encoded = borsh.serialize(schema, value);
 const decoded = borsh.deserialize(schema, encoded, Test); // decoded is an instance of Test
 ```
 
-## Type Mappings
-
-| Javascript                                 | Borsh                             |
-|--------------------------------------------|-----------------------------------|
-| `number`                                   | `u8` `u16` `u32` `i8` `i16` `i32` |
-| [`BN`](https://github.com/indutny/bn.js/)  | `u64` `u128` `i64` `i128`         |
-| `number`                                   | `f32` `f64`                       |
-| `number`                                   | `f32` `f64`                       |
-| `boolean`                                  | `bool`                            |
-| `string`                                   | UTF-8 string                      |
-| `type[]`                                   | fixed-size byte array             |
-| `type[]`                                   | dynamic sized array               |
-| N/A                                        | enum                              |
-| `Map`                                      | HashMap                           |
-| `Set`                                      | HashSet                           |
-| `null` or `type`                           | Option                            |
-
 ## API
 The package exposes the following functions:
 - `serialize(schema: Schema, obj: any): Uint8Array` - serializes an object `obj` according to the schema `schema`.
@@ -76,6 +59,8 @@ The package exposes the following functions:
 ## Schemas
 Schemas are used to describe the structure of the data being serialized or deserialized. They are used to
 validate the data and to determine the order of the fields in the serialized data.
+
+> NOTE: You can find examples of valid in the [test](./borsh-ts/test/utils.test.js) folder.
 
 ### Basic Types
 Basic types are described by a string. The following types are supported:
@@ -93,7 +78,23 @@ More complex objects are described by a JSON object. The following types are sup
 - `{ set: Schema }` - a set. The type of the elements is described by the `type` field.
 - `{ struct: { field1: Schema1, field2: Schema2, ... } }` - a struct. The fields of the struct are described by the `field1`, `field2`, etc. fields.
 
-> NOTE: You can find examples of valid in the [test](./borsh-ts/test/utils.test.js) folder.
+### Type Mappings
+
+| Javascript                                 | Borsh                             |
+|--------------------------------------------|-----------------------------------|
+| `number`                                   | `u8` `u16` `u32` `i8` `i16` `i32` |
+| [`BN`](https://github.com/indutny/bn.js/)  | `u64` `u128` `i64` `i128`         |
+| `number`                                   | `f32` `f64`                       |
+| `number`                                   | `f32` `f64`                       |
+| `boolean`                                  | `bool`                            |
+| `string`                                   | UTF-8 string                      |
+| `type[]`                                   | fixed-size byte array             |
+| `type[]`                                   | dynamic sized array               |
+| N/A                                        | enum                              |
+| `Map`                                      | HashMap                           |
+| `Set`                                      | HashSet                           |
+| `null` or `type`                           | Option                            |
+
 
 ---
 
