@@ -109,6 +109,20 @@ test('serialize complex structures', async () => {
     check_encode(mixture, schema, expected);
 });
 
+test('serializes big structs', async () => {
+    const bigStruct = new BigStruct();
+    const schema = {
+        struct: {
+            u64: 'u64',
+            u128: 'u128',
+            arr: { array: { type: 'u8', len: 1000 } }
+        }
+    };
+
+    const expected = Array(24).fill(255).concat([...Array(1000).keys()].map(x => x*2));
+
+    check_encode(bigStruct, schema, expected);
+});
 
 // Aux structures
 class Numbers {
@@ -139,4 +153,18 @@ class MixtureTwo {
     u128Val = new BN(128);
     uint8arrays = [this.uint8array, this.uint8array];
     u64Arr = [new BN('10000000000'), new BN('100000000000')];
+}
+
+const u64MaxHex = 'ffffffffffffffff';
+
+class BigStruct {
+    u64 = new BN(u64MaxHex, 16);
+    u128 = new BN(u64MaxHex.repeat(2), 16);
+    arr = [];
+
+    constructor() {
+        for (let i = 0; i < 1000; i++) {
+            this.arr.push(i*2);
+        }
+    }
 }
