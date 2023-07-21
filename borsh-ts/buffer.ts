@@ -23,37 +23,12 @@ export class EncodeBuffer {
     }
 
     store_value(value: number, type: IntegerType): void {
-        const size = parseInt(type.substring(1)) / 8;
+        const bSize = type.substring(1);
+        const size = parseInt(bSize) / 8;
         this.resize_if_necessary(size);
 
-        switch (type) {
-        case 'u8':
-            this.view.setUint8(this.offset, value);
-            break;
-        case 'u16':
-            this.view.setUint16(this.offset, value, true);
-            break;
-        case 'u32':
-            this.view.setUint32(this.offset, value, true);
-            break;
-        case 'i8':
-            this.view.setInt8(this.offset, value);
-            break;
-        case 'i16':
-            this.view.setInt16(this.offset, value, true);
-            break;
-        case 'i32':
-            this.view.setInt32(this.offset, value, true);
-            break;
-        case 'f32':
-            this.view.setFloat32(this.offset, value, true);
-            break;
-        case 'f64':
-            this.view.setFloat64(this.offset, value, true);
-            break;
-        default:
-            throw new Error(`Unsupported integer type: ${type}`);
-        }
+        const toCall = type[0] === 'f'? `setFloat${bSize}`: type[0] === 'i'? `setInt${bSize}` : `setUint${bSize}`;
+        this.view[toCall](this.offset, value, true);
         this.offset += size;
     }
 
@@ -83,39 +58,13 @@ export class DecodeBuffer {
     }
 
     consume_value(type: IntegerType): number {
-        const size = parseInt(type.substring(1)) / 8;
+        const bSize = type.substring(1);
+        const size = parseInt(bSize) / 8;
         this.assert_enough_buffer(size);
 
-        let ret: number;
+        const toCall = type[0] === 'f'? `getFloat${bSize}`: type[0] === 'i'? `getInt${bSize}` : `getUint${bSize}`;
+        const ret = this.view[toCall](this.offset, true);
 
-        switch (type) {
-        case 'u8':
-            ret = this.view.getUint8(this.offset);
-            break;
-        case 'u16':
-            ret = this.view.getUint16(this.offset, true);
-            break;
-        case 'u32':
-            ret = this.view.getUint32(this.offset, true);
-            break;
-        case 'i8':
-            ret = this.view.getInt8(this.offset);
-            break;
-        case 'i16':
-            ret = this.view.getInt16(this.offset, true);
-            break;
-        case 'i32':
-            ret = this.view.getInt32(this.offset, true);
-            break;
-        case 'f32':
-            ret = this.view.getFloat32(this.offset, true);
-            break;
-        case 'f64':
-            ret = this.view.getFloat64(this.offset, true);
-            break;
-        default:
-            throw new Error(`Unsupported integer type: ${type}`);
-        }
         this.offset += size;
         return ret;
     }
