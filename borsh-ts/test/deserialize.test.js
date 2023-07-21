@@ -5,14 +5,12 @@ function check_decode(expected, schema, buffer, classType) {
     const decoded = borsh.deserialize(schema, buffer, classType);
 
     if (expected && typeof (expected) === 'object' && 'eq' in expected) {
-        expect(expected.eq(decoded)).toBe(true);
-    } else {
-        if (schema === 'f32') {
-            expect(decoded).toBeCloseTo(expected);
-        } else {
-            expect(decoded).toEqual(expected);
-        }
-    }
+        return expect(expected.eq(decoded)).toBe(true);
+    } 
+
+    if (schema === 'f32') return expect(decoded).toBeCloseTo(expected);
+
+    expect(decoded).toEqual(expected);
 }
 
 test('deserialize integers', async () => {
@@ -79,6 +77,14 @@ test('deserialize struct', async () => {
     check_decode(numbers, schema, [1, 2, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 254, 255, 253, 255, 255, 255, 252, 255, 255, 255, 255, 255, 255, 255, 0, 0, 192, 64, 102, 102, 102, 102, 102, 102, 28, 64], Numbers);
 
     check_decode(new Map([['a', 1], ['b', 2]]), { map: { key: 'string', value: 'u8' } }, [2, 0, 0, 0, 1, 0, 0, 0, 97, 1, 1, 0, 0, 0, 98, 2]);
+
+    const options = new Options();
+    const schemaOpt = {
+        struct: {
+            u32: {option: 'u32'}, option: {option: 'string'}, u8: {option: 'u8'}
+        }
+    };
+    check_decode(options, schemaOpt, [1, 2, 0, 0, 0, 0, 1, 1], Options);
 });
 
 test('deserialize complex structures', async () => {
@@ -142,6 +148,12 @@ class Numbers {
     i64 = new BN(-4);
     f32 = 6.0;
     f64 = 7.1;
+}
+
+class Options {
+    u32 = 2;
+    option = null;
+    u8 = 1;
 }
 
 class MixtureTwo {

@@ -72,6 +72,14 @@ test('serialize struct', async () => {
         }
     };
     check_encode(numbers, schema, [1, 2, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 254, 255, 253, 255, 255, 255, 252, 255, 255, 255, 255, 255, 255, 255, 0, 0, 192, 64, 102, 102, 102, 102, 102, 102, 28, 64]);
+
+    const options = new Options();
+    const schemaOpt = {
+        struct: {
+            u32: {option: 'u32'}, option: {option: 'string'}, u8: {option: 'u8'}
+        }
+    };
+    check_encode(options, schemaOpt, [1, 2, 0, 0, 0, 0, 1, 1]);
 });
 
 test('serialize complex structures', async () => {
@@ -119,7 +127,7 @@ test('serializes big structs', async () => {
         }
     };
 
-    const expected = Array(24).fill(255).concat([...Array(1000).keys()].map(x => x*2));
+    const expected = Array(24).fill(255).concat([...Array(1000).keys()].map(x => x * 2));
 
     check_encode(bigStruct, schema, expected);
 });
@@ -137,6 +145,12 @@ class Numbers {
     i64 = new BN(-4);
     f32 = 6.0;
     f64 = 7.1;
+}
+
+class Options {
+    u32 = 2;
+    option = null;
+    u8 = 1;
 }
 
 class MixtureTwo {
@@ -164,7 +178,7 @@ class BigStruct {
 
     constructor() {
         for (let i = 0; i < 1000; i++) {
-            this.arr.push(i*2);
+            this.arr.push(i * 2);
         }
     }
 }
