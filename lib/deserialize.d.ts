@@ -11,8 +11,8 @@ export declare class BorshDeserializer {
     decode_string(): string;
     decode_boolean(): boolean;
     decode_option(schema: OptionType): DecodeTypes;
-    decode_array(schema: ArrayType): Array<any>;
-    decode_set(schema: SetType): Set<any>;
-    decode_map(schema: MapType): Map<any, any>;
+    decode_array(schema: ArrayType): Array<DecodeTypes>;
+    decode_set(schema: SetType): Set<DecodeTypes>;
+    decode_map(schema: MapType): Map<DecodeTypes, DecodeTypes>;
     decode_struct(schema: StructType, classType?: ObjectConstructor): object;
 }

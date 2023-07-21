@@ -14,4 +14,4 @@ export type StructType = { struct: { [key: string]: Schema } };
 export type Schema = IntegerType | StringType | ArrayType | SetType | MapType | StructType;
 
 // returned
-export type DecodeTypes = number | BN | string | boolean | Array<any> | ArrayBuffer | Map<any, any> | Set<any> | object | null;
+export type DecodeTypes = number | BN | string | boolean | Array<DecodeTypes> | ArrayBuffer | Map<DecodeTypes, DecodeTypes> | Set<DecodeTypes> | object | null;

@@ -41,7 +41,7 @@ const VALID_OBJECT_KEYS = ['option', 'array', 'set', 'map', 'struct'];
 
 export class ErrorSchema extends Error {
     constructor(schema: Schema, expected: string) {
-        const message = `Invalid schema: ${JSON.stringify(schema)} expected ${expected}`
+        const message = `Invalid schema: ${JSON.stringify(schema)} expected ${expected}`;
         super(message);
     }
 }

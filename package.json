@@ -12,8 +12,6 @@
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "test": "jest test --runInBand",
-    "fuzz": "jsfuzz borsh-ts/test/fuzz/borsh-roundtrip.js borsh-ts/test/fuzz/corpus/",
-    "dev": "yarn build -w",
     "pretest": "yarn build",
     "lint": "eslint borsh-ts/**/*.ts",
     "fix": "eslint borsh-ts/**/*.ts --fix"
@@ -43,17 +41,11 @@
     "@types/node": "^12.7.3",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
-    "bs58": "^4.0.0",
     "eslint": "^8.17.0",
     "jest": "^26.0.1",
-    "js-sha256": "^0.9.0",
-    "jsfuzz": "^1.0.14",
     "typescript": "^4"
   },
   "dependencies": {
-    "bn.js": "^5.2.0",
-    "bs58": "^4.0.0",
-    "buffer": "^6.0.3",
-    "text-encoding-utf-8": "^1.0.2"
+    "bn.js": "^5.2.0"
   }
 }

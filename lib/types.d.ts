@@ -27,4 +27,4 @@ export type StructType = {
     };
 };
 export type Schema = IntegerType | StringType | ArrayType | SetType | MapType | StructType;
-export type DecodeTypes = number | BN | string | boolean | Array<any> | ArrayBuffer | Map<any, any> | Set<any> | object | null;
+export type DecodeTypes = number | BN | string | boolean | Array<DecodeTypes> | ArrayBuffer | Map<DecodeTypes, DecodeTypes> | Set<DecodeTypes> | object | null;

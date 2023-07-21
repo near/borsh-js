@@ -81,7 +81,7 @@ export class BorshDeserializer {
         return null;
     }
 
-    decode_array(schema: ArrayType): Array<any> {
+    decode_array(schema: ArrayType): Array<DecodeTypes> {
         const result = [];
         const len = schema.array.len ? schema.array.len : this.decode_integer('u32') as number;
 
@@ -92,16 +92,16 @@ export class BorshDeserializer {
         return result;
     }
 
-    decode_set(schema: SetType): Set<any> {
+    decode_set(schema: SetType): Set<DecodeTypes> {
         const len = this.decode_integer('u32') as number;
-        const result = new Set();
+        const result = new Set<DecodeTypes>();
         for (let i = 0; i < len; ++i) {
             result.add(this.decode_value(schema.set));
         }
         return result;
     }
 
-    decode_map(schema: MapType): Map<any, any> {
+    decode_map(schema: MapType): Map<DecodeTypes, DecodeTypes> {
         const len = this.decode_integer('u32') as number;
         const result = new Map();
         for (let i = 0; i < len; ++i) {
