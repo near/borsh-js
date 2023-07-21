@@ -76,8 +76,16 @@ export class DecodeBuffer {
         this.view = new DataView(this.buffer);
     }
 
+    assert_enough_buffer(size: number): void {
+        if (this.offset + size > this.buffer.byteLength) {
+            throw new Error('Error in schema, the buffer is smaller than expected');
+        }
+    }
+
     consume_value(type: IntegerType): number {
         const size = parseInt(type.substring(1)) / 8;
+        this.assert_enough_buffer(size);
+
         let ret: number;
 
         switch (type) {
@@ -113,33 +121,9 @@ export class DecodeBuffer {
     }
 
     consume_bytes(size: number): ArrayBuffer {
+        this.assert_enough_buffer(size);
         const ret = this.buffer.slice(this.offset, this.offset + size);
         this.offset += size;
         return ret;
     }
 }
-// export class DecodeBuffer {
-//     public offset: number = 0;
-//     public start: usize;
-
-//     constructor(public arrBuffer: ArrayBuffer) {
-//         this.start = changetype<usize>(arrBuffer)
-//     }
-
-//     consume<T>(): T {
-//         const off = this.offset
-//         this.offset += sizeof<T>()
-//         return load<T>(this.start + off)
-//     }
-
-//     consume_slice(length: number): ArrayBuffer {
-//         const off = this.offset
-//         this.offset += length
-//         return changetype<ArrayBuffer>(this.start).slice(off, off + length)
-//     }
-
-//     consume_copy(dst: usize, length: number): void {
-//         memory.copy(dst, this.start + this.offset, length);
-//         this.offset += length;
-//     }
-// }

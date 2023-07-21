@@ -72,7 +72,41 @@ test('serialize struct', async () => {
         }
     };
     check_encode(numbers, schema, [1, 2, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 254, 255, 253, 255, 255, 255, 252, 255, 255, 255, 255, 255, 255, 255, 0, 0, 192, 64, 102, 102, 102, 102, 102, 102, 28, 64]);
+});
 
+test('serialize complex structures', async () => {
+    // computed by hand       i32,          u32,                 u64val,                                 i64val, B,
+    const expected = [65, 1, 0, 0, 123, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 192, 255, 255, 255, 255, 255, 255, 255, 1,
+        //                                     string,  u8array,        
+        7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103, 240, 241,
+        // Array<Array<string>>
+        2, 0, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103, 1, 0, 0, 0, 7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103,
+        //                            u32Arr,     i32Arr,                                             u128,
+        2, 0, 0, 0, 21, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        //           Array<Uint8Array>,                                                            // u64Arr
+        2, 0, 0, 0, 240, 241, 240, 241, 2, 0, 0, 0, 0, 228, 11, 84, 2, 0, 0, 0, 0, 232, 118, 72, 23, 0, 0, 0];
+
+    const mixture = new MixtureTwo();
+
+    const schema = {
+        struct: {
+            foo: 'u32',
+            bar: 'i32',
+            u64Val: 'u64',
+            i64Val: 'i64',
+            flag: 'bool',
+            baz: 'string',
+            uint8array: { array: { type: 'u8', len: 2 } },
+            arr: { array: { type: { array: { type: 'string' } } } },
+            u32Arr: { array: { type: 'u32' } },
+            i32Arr: { array: { type: 'i32' } },
+            u128Val: 'u128',
+            uint8arrays: { array: { type: { array: { type: 'u8', len: 2 } } } },
+            u64Arr: { array: { type: 'u64' } },
+        }
+    };
+
+    check_encode(mixture, schema, expected);
 });
 
 
@@ -89,4 +123,20 @@ class Numbers {
     i64 = new BN(-4);
     f32 = 6.0;
     f64 = 7.1;
+}
+
+class MixtureTwo {
+    foo = 321;
+    bar = 123;
+    u64Val = new BN('4294967297');
+    i64Val = new BN(-64);
+    flag = true;
+    baz = 'testing';
+    uint8array = new Uint8Array([240, 241]);
+    arr = [['testing'], ['testing']];
+    u32Arr = [21, 11];
+    i32Arr = [];
+    u128Val = new BN(128);
+    uint8arrays = [this.uint8array, this.uint8array];
+    u64Arr = [new BN('10000000000'), new BN('100000000000')];
 }

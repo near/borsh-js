@@ -15,6 +15,7 @@ export declare class DecodeBuffer {
     buffer: ArrayBuffer;
     view: DataView;
     constructor(buf: Uint8Array);
+    assert_enough_buffer(size: number): void;
     consume_value(type: IntegerType): number;
     consume_bytes(size: number): ArrayBuffer;
 }
