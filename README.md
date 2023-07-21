@@ -18,15 +18,20 @@ safety, speed, and comes with a strict specification.
 ### (De)serializing a Value
 ```javascript
 import * as borsh from 'borsh';
-const encoded = borsh.serialize('u8', 2);
-const decoded = borsh.deserialize('u8', encoded);
+
+const encodedU16 = borsh.serialize('u16', 2);
+const decodedU16 = borsh.deserialize('u16', encodedU16);
+
+const encodedStr = borsh.serialize('string', 'testing');
+const decodedStr = borsh.deserialize('string', encodedStr);
 ```
 
 ### (De)serializing an Object
 ```javascript
 import * as borsh from 'borsh';
+import BN from 'bn.js';
 
-const value = { x: 255, y: 20, z: '123', arr: [1, 2, 3] };
+const value = new Test({x: 255, y: new BN(20), z: '123', arr: [1, 2, 3]});
 const schema = { struct: { x: 'u8', y: 'u64', 'z': 'string', 'arr': { array: { type: 'u8' }}}};
 
 const encoded = borsh.serialize(schema, value);
@@ -36,9 +41,10 @@ const decoded = borsh.deserialize(schema, encoded);
 ### (De)serializing a Class Instance
 ```javascript
 import * as borsh from 'borsh';
+import BN from 'bn.js';
 
 class Test{ constructor({x, y, z, arr}){ Object.assign(this, {x, y, z, arr}) }}
-const value = new Test({x: 255, y: 20, z: '123', arr: [1, 2, 3]});
+const value = new Test({x: 255, y: new BN(20), z: '123', arr: [1, 2, 3]});
 const schema = { struct: { x: 'u8', y: 'u64', 'z': 'string', 'arr': { array: { type: 'u8' }}}};
 
 const encoded = borsh.serialize(schema, value);
