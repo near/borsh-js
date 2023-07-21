@@ -1,4 +1,4 @@
-import { NumberType } from './types';
+import { IntegerType } from './types';
 export declare class EncodeBuffer {
     offset: number;
     buffer_size: number;
@@ -6,7 +6,7 @@ export declare class EncodeBuffer {
     view: DataView;
     resize_if_necessary(needed_space: number): void;
     get_used_buffer(): Uint8Array;
-    store_value(value: number, type: NumberType): void;
+    store_value(value: number, type: IntegerType): void;
     store_bytes(from: Uint8Array): void;
 }
 export declare class DecodeBuffer {
@@ -15,6 +15,6 @@ export declare class DecodeBuffer {
     buffer: ArrayBuffer;
     view: DataView;
     constructor(buf: Uint8Array);
-    consume_value(type: NumberType): number;
+    consume_value(type: IntegerType): number;
     consume_bytes(size: number): ArrayBuffer;
 }

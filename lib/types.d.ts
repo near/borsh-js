@@ -1,6 +1,6 @@
 import BN from 'bn.js';
-export declare const numbers: string[];
-export type NumberType = typeof numbers[number];
+export declare const integers: string[];
+export type IntegerType = typeof integers[number];
 export type BoolType = 'bool';
 export type StringType = 'string';
 export type OptionType = {
@@ -26,5 +26,5 @@ export type StructType = {
         [key: string]: Schema;
     };
 };
-export type Schema = NumberType | StringType | ArrayType | SetType | MapType | StructType;
+export type Schema = IntegerType | StringType | ArrayType | SetType | MapType | StructType;
 export type DecodeTypes = number | BN | string | boolean | Array<any> | ArrayBuffer | Map<any, any> | Set<any> | object | null;

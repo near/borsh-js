@@ -1,4 +1,4 @@
-import { ArrayType, MapType, NumberType, OptionType, Schema, SetType, StructType, numbers } from './types';
+import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers } from './types';
 import { EncodeBuffer } from './buffer';
 import BN from 'bn.js';
 import * as utils from './utils';
@@ -7,24 +7,28 @@ export class BorshSerializer {
     encoded: EncodeBuffer = new EncodeBuffer();
 
     encode(value: unknown, schema: Schema): Uint8Array {
-        if (typeof schema === 'string') {
-            if (numbers.includes(schema)) this.encode_integer(value, schema);
-            if (schema === 'string') this.encode_string(value);
-            if (schema === 'bool') this.encode_boolean(value);
-        }
-
-        if (typeof schema === 'object') {
-            if ('option' in schema) this.encode_option(value, schema as OptionType);
-            if ('array' in schema) this.encode_array(value, schema as ArrayType);
-            if ('set' in schema) this.encode_set(value, schema as SetType);
-            if ('map' in schema) this.encode_map(value, schema as MapType);
-            if ('struct' in schema) this.encode_struct(value, schema as StructType);
-        }
-
+        utils.validate_schema(schema);
+        this.encode_value(value, schema);
         return this.encoded.get_used_buffer();
     }
 
-    encode_integer(value: unknown, schema: NumberType): void {
+    encode_value(value: unknown, schema: Schema): void {
+        if (typeof schema === 'string') {
+            if (integers.includes(schema)) return this.encode_integer(value, schema);
+            if (schema === 'string') return this.encode_string(value);
+            if (schema === 'bool') return this.encode_boolean(value);
+        }
+
+        if (typeof schema === 'object') {
+            if ('option' in schema) return this.encode_option(value, schema as OptionType);
+            if ('array' in schema) return this.encode_array(value, schema as ArrayType);
+            if ('set' in schema) return this.encode_set(value, schema as SetType);
+            if ('map' in schema) return this.encode_map(value, schema as MapType);
+            if ('struct' in schema) return this.encode_struct(value, schema as StructType);
+        }
+    }
+
+    encode_integer(value: unknown, schema: IntegerType): void {
         const size: number = parseInt(schema.substring(1));
 
         if (size <= 32 || schema == 'f64') {
@@ -76,7 +80,7 @@ export class BorshSerializer {
             this.encoded.store_value(0, 'u8');
         } else {
             this.encoded.store_value(1, 'u8');
-            this.encode(value, schema.option);
+            this.encode_value(value, schema.option);
         }
     }
 
@@ -96,7 +100,7 @@ export class BorshSerializer {
 
         // array values
         for (let i = 0; i < value.length; i++) {
-            this.encode(value[i], schema.array.type);
+            this.encode_value(value[i], schema.array.type);
         }
     }
 
@@ -123,7 +127,7 @@ export class BorshSerializer {
 
         // set values
         for (const value of values) {
-            this.encode(value, schema.set);
+            this.encode_value(value, schema.set);
         }
     }
 
@@ -138,8 +142,8 @@ export class BorshSerializer {
 
         // store key/values
         for (const key of keys) {
-            this.encode(key, schema.map.key);
-            this.encode(isMap ? value.get(key) : value[key], schema.map.value);
+            this.encode_value(key, schema.map.key);
+            this.encode_value(isMap ? value.get(key) : value[key], schema.map.value);
         }
     }
 
@@ -147,7 +151,7 @@ export class BorshSerializer {
         utils.expect_type(value, 'object');
 
         for (const key of Object.keys(value)) {
-            this.encode(value[key], schema.struct[key]);
+            this.encode_value(value[key], schema.struct[key]);
         }
     }
 }

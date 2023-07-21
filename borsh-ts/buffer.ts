@@ -1,4 +1,4 @@
-import { NumberType } from './types';
+import { IntegerType } from './types';
 
 export class EncodeBuffer {
     offset = 0;
@@ -22,7 +22,7 @@ export class EncodeBuffer {
         return new Uint8Array(this.buffer).slice(0, this.offset);
     }
 
-    store_value(value: number, type: NumberType): void {
+    store_value(value: number, type: IntegerType): void {
         const size = parseInt(type.substring(1)) / 8;
         this.resize_if_necessary(size);
 
@@ -76,7 +76,7 @@ export class DecodeBuffer {
         this.view = new DataView(this.buffer);
     }
 
-    consume_value(type: NumberType): number {
+    consume_value(type: IntegerType): number {
         const size = parseInt(type.substring(1)) / 8;
         let ret: number;
 

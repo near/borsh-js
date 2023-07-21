@@ -1,10 +1,11 @@
-import { ArrayType, MapType, NumberType, OptionType, Schema, SetType, StructType } from './types';
+import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType } from './types';
 import { EncodeBuffer } from './buffer';
 import BN from 'bn.js';
 export declare class BorshSerializer {
     encoded: EncodeBuffer;
     encode(value: unknown, schema: Schema): Uint8Array;
-    encode_integer(value: unknown, schema: NumberType): void;
+    encode_value(value: unknown, schema: Schema): void;
+    encode_integer(value: unknown, schema: IntegerType): void;
     encode_bigint(value: BN, size: number): void;
     encode_string(value: unknown): void;
     encode_boolean(value: unknown): void;

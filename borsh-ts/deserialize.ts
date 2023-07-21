@@ -1,4 +1,5 @@
-import { ArrayType, DecodeTypes, MapType, NumberType, OptionType, Schema, SetType, StructType, numbers } from './types';
+import { ArrayType, DecodeTypes, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers } from './types';
+import * as utils from './utils';
 import { DecodeBuffer } from './buffer';
 import BN from 'bn.js';
 
@@ -10,9 +11,13 @@ export class BorshDeserializer {
     }
 
     decode(schema: Schema, classType?: ObjectConstructor): DecodeTypes {
+        utils.validate_schema(schema);
+        return this.decode_value(schema, classType);
+    }
 
+    decode_value(schema: Schema, classType?: ObjectConstructor): DecodeTypes {
         if (typeof schema === 'string') {
-            if (numbers.includes(schema)) return this.decode_integer(schema);
+            if (integers.includes(schema)) return this.decode_integer(schema);
             if (schema === 'string') return this.decode_string();
             if (schema === 'bool') return this.decode_boolean();
         }
@@ -28,7 +33,7 @@ export class BorshDeserializer {
         throw new Error(`Unsupported type: ${schema}`);
     }
 
-    decode_integer(schema: NumberType): number | BN {
+    decode_integer(schema: IntegerType): number | BN {
         const size: number = parseInt(schema.substring(1));
 
         if (size <= 32 || schema == 'f64') {
@@ -70,7 +75,7 @@ export class BorshDeserializer {
     decode_option(schema: OptionType): DecodeTypes {
         const option = this.buffer.consume_value('u8');
         if (option === 1) {
-            return this.decode(schema.option);
+            return this.decode_value(schema.option);
         }
         if (option !== 0) {
             throw new Error(`Invalid option ${option}`);
@@ -83,7 +88,7 @@ export class BorshDeserializer {
         const len = schema.array.len ? schema.array.len : this.decode_integer('u32') as number;
 
         for (let i = 0; i < len; ++i) {
-            result.push(this.decode(schema.array.type));
+            result.push(this.decode_value(schema.array.type));
         }
 
         return result;
@@ -93,7 +98,7 @@ export class BorshDeserializer {
         const len = this.decode_integer('u32') as number;
         const result = new Set();
         for (let i = 0; i < len; ++i) {
-            result.add(this.decode(schema.set));
+            result.add(this.decode_value(schema.set));
         }
         return result;
     }
@@ -102,8 +107,8 @@ export class BorshDeserializer {
         const len = this.decode_integer('u32') as number;
         const result = new Map();
         for (let i = 0; i < len; ++i) {
-            const key = this.decode(schema.map.key);
-            const value = this.decode(schema.map.value);
+            const key = this.decode_value(schema.map.key);
+            const value = this.decode_value(schema.map.value);
             result.set(key, value);
         }
         return result;
@@ -112,7 +117,7 @@ export class BorshDeserializer {
     decode_struct(schema: StructType, classType?: ObjectConstructor): object {
         const result = {};
         for (const key in schema.struct) {
-            result[key] = this.decode(schema.struct[key]);
+            result[key] = this.decode_value(schema.struct[key]);
         }
         return classType ? new classType(result) : result;
     }
