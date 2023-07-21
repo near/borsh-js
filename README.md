@@ -53,20 +53,20 @@ const decoded = borsh.deserialize(schema, encoded, Test); // decoded is an insta
 
 ## Type Mappings
 
-| Javascript                                | Borsh                             |
-|-------------------------------------------|-----------------------------------|
-| `number`                                  | `u8` `u16` `u32` `i8` `i16` `i32` |
-| [`BN`](https://github.com/indutny/bn.js/) | `u64` `u128` `i64` `i128`         |
-| `number`                                  | `f32` `f64`                       |
-| `number`                                  | `f32` `f64`                       |
-| `boolean`                                 | `bool`                            |
-| `string`                                  | UTF-8 string                      |
-| `Array`                                   | fixed-size byte array             |
-| `Array`                                   | dynamic sized array               |
-| N/A                                       | enum                              |
-| `Map`                                     | HashMap                           |
-| `Set`                                     | HashSet                           |
-| `null` or type                            | Option                            |
+| Javascript                                 | Borsh                             |
+|--------------------------------------------|-----------------------------------|
+| `number`                                   | `u8` `u16` `u32` `i8` `i16` `i32` |
+| [`BN`](https://github.com/indutny/bn.js/)  | `u64` `u128` `i64` `i128`         |
+| `number`                                   | `f32` `f64`                       |
+| `number`                                   | `f32` `f64`                       |
+| `boolean`                                  | `bool`                            |
+| `string`                                   | UTF-8 string                      |
+| `type[]`                                   | fixed-size byte array             |
+| `type[]`                                   | dynamic sized array               |
+| N/A                                        | enum                              |
+| `Map`                                      | HashMap                           |
+| `Set`                                      | HashSet                           |
+| `null` or `type`                           | Option                            |
 
 ## API
 The package exposes the following functions:
