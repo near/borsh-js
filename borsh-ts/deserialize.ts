@@ -45,11 +45,9 @@ export class BorshDeserializer {
     decode_bigint(size: number): BN {
         const buffer_len = size / 8;
         const buffer = new Uint8Array(this.buffer.consume_bytes(buffer_len));
-        const value = new BN(buffer, 'le');
 
-        if (value.testn(buffer_len * 8 - 1)) {
+        if (buffer[buffer_len - 1]) {
             // negative number
-            const buffer = value.toArray('le', buffer_len + 1);
             let carry = 1;
             for (let i = 0; i < buffer_len; i++) {
                 const v = (buffer[i] ^ 0xff) + carry;
@@ -59,7 +57,7 @@ export class BorshDeserializer {
             return new BN(buffer, 'le').mul(new BN(-1));
         }
 
-        return value;
+        return new BN(buffer, 'le');
     }
 
     decode_string(): string {
