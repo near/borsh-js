@@ -1,4 +1,4 @@
-import { ArrayType, DecodeTypes, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers } from './types';
+import { ArrayType, DecodeTypes, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers, EnumType } from './types';
 import * as utils from './utils';
 import { DecodeBuffer } from './buffer';
 import BN from 'bn.js';
@@ -10,12 +10,12 @@ export class BorshDeserializer {
         this.buffer = new DecodeBuffer(bufferArray);
     }
 
-    decode(schema: Schema, classType?: ObjectConstructor): DecodeTypes {
+    decode(schema: Schema): DecodeTypes {
         utils.validate_schema(schema);
-        return this.decode_value(schema, classType);
+        return this.decode_value(schema);
     }
 
-    decode_value(schema: Schema, classType?: ObjectConstructor): DecodeTypes {
+    decode_value(schema: Schema): DecodeTypes {
         if (typeof schema === 'string') {
             if (integers.includes(schema)) return this.decode_integer(schema);
             if (schema === 'string') return this.decode_string();
@@ -24,10 +24,11 @@ export class BorshDeserializer {
 
         if (typeof schema === 'object') {
             if ('option' in schema) return this.decode_option(schema as OptionType);
+            if ('enum' in schema) return this.decode_enum(schema as EnumType);
             if ('array' in schema) return this.decode_array(schema as ArrayType);
             if ('set' in schema) return this.decode_set(schema as SetType);
             if ('map' in schema) return this.decode_map(schema as MapType);
-            if ('struct' in schema) return this.decode_struct(schema as StructType, classType);
+            if ('struct' in schema) return this.decode_struct(schema as StructType);
         }
 
         throw new Error(`Unsupported type: ${schema}`);
@@ -39,14 +40,14 @@ export class BorshDeserializer {
         if (size <= 32 || schema == 'f64') {
             return this.buffer.consume_value(schema);
         }
-        return this.decode_bigint(size);
+        return this.decode_bigint(size, schema.startsWith('i'));
     }
 
-    decode_bigint(size: number): BN {
+    decode_bigint(size: number, signed = false): BN {
         const buffer_len = size / 8;
         const buffer = new Uint8Array(this.buffer.consume_bytes(buffer_len));
 
-        if (buffer[buffer_len - 1]) {
+        if (signed && buffer[buffer_len - 1]) {
             // negative number
             let carry = 1;
             for (let i = 0; i < buffer_len; i++) {
@@ -81,6 +82,18 @@ export class BorshDeserializer {
         return null;
     }
 
+    decode_enum(schema: EnumType): DecodeTypes {
+        const valueIndex = this.buffer.consume_value('u8');
+
+        if (valueIndex > schema.enum.length) {
+            throw new Error(`Enum option ${valueIndex} is not available`);
+        }
+
+        const struct = schema.enum[valueIndex].struct;
+        const key = Object.keys(struct)[0];
+        return { [key]: this.decode_value(struct[key]) };
+    }
+
     decode_array(schema: ArrayType): Array<DecodeTypes> {
         const result = [];
         const len = schema.array.len ? schema.array.len : this.decode_integer('u32') as number;
@@ -112,11 +125,11 @@ export class BorshDeserializer {
         return result;
     }
 
-    decode_struct(schema: StructType, classType?: ObjectConstructor): object {
+    decode_struct(schema: StructType): object {
         const result = {};
         for (const key in schema.struct) {
             result[key] = this.decode_value(schema.struct[key]);
         }
-        return classType ? new classType(result) : result;
+        return result;
     }
 }

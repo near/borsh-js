@@ -1,4 +1,4 @@
-import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers } from './types';
+import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers, EnumType } from './types';
 import { EncodeBuffer } from './buffer';
 import BN from 'bn.js';
 import * as utils from './utils';
@@ -21,6 +21,7 @@ export class BorshSerializer {
 
         if (typeof schema === 'object') {
             if ('option' in schema) return this.encode_option(value, schema as OptionType);
+            if ('enum' in schema) return this.encode_enum(value, schema as EnumType);
             if ('array' in schema) return this.encode_array(value, schema as ArrayType);
             if ('set' in schema) return this.encode_set(value, schema as SetType);
             if ('map' in schema) return this.encode_map(value, schema as MapType);
@@ -82,6 +83,22 @@ export class BorshSerializer {
             this.encoded.store_value(1, 'u8');
             this.encode_value(value, schema.option);
         }
+    }
+
+    encode_enum(value: unknown, schema: EnumType): void {
+        utils.expect_enum(value);
+
+        const valueKey = Object.keys(value)[0];
+
+        for (let i = 0; i < schema.enum.length; i++) {
+            const valueSchema = schema.enum[i] as StructType;
+
+            if (valueKey === Object.keys(valueSchema.struct)[0]) {
+                this.encoded.store_value(i, 'u8');
+                return this.encode_struct(value, valueSchema as StructType);
+            }
+        }
+        throw new Error(`Enum key (${valueKey}) not found in enum schema: ${JSON.stringify(schema)}`);
     }
 
     encode_array(value: unknown, schema: ArrayType): void {

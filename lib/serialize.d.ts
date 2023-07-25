@@ -1,4 +1,4 @@
-import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType } from './types';
+import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType, EnumType } from './types';
 import { EncodeBuffer } from './buffer';
 import BN from 'bn.js';
 export declare class BorshSerializer {
@@ -10,6 +10,7 @@ export declare class BorshSerializer {
     encode_string(value: unknown): void;
     encode_boolean(value: unknown): void;
     encode_option(value: unknown, schema: OptionType): void;
+    encode_enum(value: unknown, schema: EnumType): void;
     encode_array(value: unknown, schema: ArrayType): void;
     encode_arraylike(value: ArrayLike<unknown>, schema: ArrayType): void;
     encode_buffer(value: ArrayBuffer, schema: ArrayType): void;

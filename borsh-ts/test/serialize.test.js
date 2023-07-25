@@ -66,55 +66,24 @@ test('serialize sets', async () => {
 
 test('serialize struct', async () => {
     const numbers = new Numbers();
-    const schema = {
-        struct: {
-            u8: 'u8', u16: 'u16', u32: 'u32', u64: 'u64', u128: 'u128', i8: 'i8', i16: 'i16', i32: 'i32', i64: 'i64', f32: 'f32', f64: 'f64'
-        }
-    };
-    check_encode(numbers, schema, [1, 2, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 254, 255, 253, 255, 255, 255, 252, 255, 255, 255, 255, 255, 255, 255, 0, 0, 192, 64, 102, 102, 102, 102, 102, 102, 28, 64]);
+    check_encode(numbers, numberSchema, expectedNumbers);
 
     const options = new Options();
     const schemaOpt = {
         struct: {
-            u32: {option: 'u32'}, option: {option: 'string'}, u8: {option: 'u8'}
+            u32: { option: 'u32' }, option: { option: 'string' }, u8: { option: 'u8' }
         }
     };
     check_encode(options, schemaOpt, [1, 2, 0, 0, 0, 0, 1, 1]);
+
+    const mixture = new Mixture();
+    check_encode(mixture, mixtureSchema, expectedMixture);
 });
 
-test('serialize complex structures', async () => {
-    // computed by hand       i32,          u32,                 u64val,                                 i64val, B,
-    const expected = [65, 1, 0, 0, 123, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 192, 255, 255, 255, 255, 255, 255, 255, 1,
-        //                                     string,  u8array,        
-        7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103, 240, 241,
-        // Array<Array<string>>
-        2, 0, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103, 1, 0, 0, 0, 7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103,
-        //                            u32Arr,     i32Arr,                                             u128,
-        2, 0, 0, 0, 21, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        //           Array<Uint8Array>,                                                            // u64Arr
-        2, 0, 0, 0, 240, 241, 240, 241, 2, 0, 0, 0, 0, 228, 11, 84, 2, 0, 0, 0, 0, 232, 118, 72, 23, 0, 0, 0];
-
-    const mixture = new MixtureTwo();
-
-    const schema = {
-        struct: {
-            foo: 'u32',
-            bar: 'i32',
-            u64Val: 'u64',
-            i64Val: 'i64',
-            flag: 'bool',
-            baz: 'string',
-            uint8array: { array: { type: 'u8', len: 2 } },
-            arr: { array: { type: { array: { type: 'string' } } } },
-            u32Arr: { array: { type: 'u32' } },
-            i32Arr: { array: { type: 'i32' } },
-            u128Val: 'u128',
-            uint8arrays: { array: { type: { array: { type: 'u8', len: 2 } } } },
-            u64Arr: { array: { type: 'u64' } },
-        }
-    };
-
-    check_encode(mixture, schema, expected);
+test('serialize enums', async () => {
+    const enumSchema = { enum: [{ struct: { Numbers: numberSchema }, construct: Numbers }, { struct: { Mixture: mixtureSchema }, construct: Mixture }] };
+    check_encode(new MyEnum({ numbers: new Numbers() }), enumSchema, [0].concat(expectedNumbers));
+    check_encode(new MyEnum({ mixture: new Mixture() }), enumSchema, [1].concat(expectedMixture));
 });
 
 test('serializes big structs', async () => {
@@ -123,16 +92,16 @@ test('serializes big structs', async () => {
         struct: {
             u64: 'u64',
             u128: 'u128',
-            arr: { array: { type: 'u8', len: 1000 } }
+            arr: { array: { type: 'u8', len: 254 } }
         }
     };
 
-    const expected = Array(24).fill(255).concat([...Array(1000).keys()].map(x => x * 2));
+    const expected = Array(24).fill(255).concat([...Array(254).keys()]);
 
     check_encode(bigStruct, schema, expected);
 });
 
-// Aux structures
+// Complex number structure
 class Numbers {
     u8 = 1;
     u16 = 2;
@@ -147,13 +116,23 @@ class Numbers {
     f64 = 7.1;
 }
 
+const numberSchema = {
+    struct: {
+        u8: 'u8', u16: 'u16', u32: 'u32', u64: 'u64', u128: 'u128', i8: 'i8', i16: 'i16', i32: 'i32', i64: 'i64', f32: 'f32', f64: 'f64'
+    }
+};
+
+const expectedNumbers = [1, 2, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 254, 255, 253, 255, 255, 255, 252, 255, 255, 255, 255, 255, 255, 255, 0, 0, 192, 64, 102, 102, 102, 102, 102, 102, 28, 64];
+
+// Options
 class Options {
     u32 = 2;
     option = null;
     u8 = 1;
 }
 
-class MixtureTwo {
+// Complex mixture of types
+class Mixture {
     foo = 321;
     bar = 123;
     u64Val = new BN('4294967297');
@@ -169,6 +148,37 @@ class MixtureTwo {
     u64Arr = [new BN('10000000000'), new BN('100000000000')];
 }
 
+const mixtureSchema = {
+    struct: {
+        foo: 'u32',
+        bar: 'i32',
+        u64Val: 'u64',
+        i64Val: 'i64',
+        flag: 'bool',
+        baz: 'string',
+        uint8array: { array: { type: 'u8', len: 2 } },
+        arr: { array: { type: { array: { type: 'string' } } } },
+        u32Arr: { array: { type: 'u32' } },
+        i32Arr: { array: { type: 'i32' } },
+        u128Val: 'u128',
+        uint8arrays: { array: { type: { array: { type: 'u8', len: 2 } } } },
+        u64Arr: { array: { type: 'u64' } },
+    }
+};
+
+// computed by hand              i32,          u32,                 u64val,                                 i64val, B,
+const expectedMixture = [65, 1, 0, 0, 123, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 192, 255, 255, 255, 255, 255, 255, 255, 1,
+    //                                     string,  u8array,        
+    7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103, 240, 241,
+    // Array<Array<string>>
+    2, 0, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103, 1, 0, 0, 0, 7, 0, 0, 0, 116, 101, 115, 116, 105, 110, 103,
+    //                            u32Arr,     i32Arr,                                             u128,
+    2, 0, 0, 0, 21, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    //           Array<Uint8Array>,                                                            // u64Arr
+    2, 0, 0, 0, 240, 241, 240, 241, 2, 0, 0, 0, 0, 228, 11, 84, 2, 0, 0, 0, 0, 232, 118, 72, 23, 0, 0, 0];
+
+
+// A structure of big nums
 const u64MaxHex = 'ffffffffffffffff';
 
 class BigStruct {
@@ -177,8 +187,15 @@ class BigStruct {
     arr = [];
 
     constructor() {
-        for (let i = 0; i < 1000; i++) {
-            this.arr.push(i * 2);
+        for (let i = 0; i < 254; i++) {
+            this.arr.push(i);
         }
+    }
+}
+
+class MyEnum {
+    constructor({ numbers, mixture }) {
+        if (numbers) this.Numbers = numbers;
+        if (mixture) this.Mixture = mixture;
     }
 }

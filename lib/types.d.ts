@@ -12,6 +12,9 @@ export type ArrayType = {
         len?: number;
     };
 };
+export type EnumType = {
+    enum: Array<StructType>;
+};
 export type SetType = {
     set: Schema;
 };
@@ -27,4 +30,4 @@ export type StructType = {
     };
 };
 export type Schema = IntegerType | StringType | ArrayType | SetType | MapType | StructType;
-export type DecodeTypes = number | BN | string | boolean | Array<DecodeTypes> | ArrayBuffer | Map<DecodeTypes, DecodeTypes> | Set<DecodeTypes> | object | null;
+export type DecodeTypes = number | BN | string | boolean | Array<DecodeTypes> | EnumType | ArrayBuffer | Map<DecodeTypes, DecodeTypes> | Set<DecodeTypes> | object | null;

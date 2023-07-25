@@ -8,9 +8,9 @@ export function serialize(schema: Schema, value: unknown): Uint8Array {
     return serializer.encode(value, schema);
 }
 
-export function deserialize(schema: Schema, buffer: Uint8Array, classType?: ObjectConstructor): DecodeTypes {
+export function deserialize(schema: Schema, buffer: Uint8Array): DecodeTypes {
     const deserializer = new BorshDeserializer(buffer);
-    return deserializer.decode(schema, classType);
+    return deserializer.decode(schema);
 }
 
 // Keeping this for compatibility reasons with the old borsh-js

@@ -26,12 +26,12 @@ test('rejects invalid schemes', async () => {
 
     expect(() => utils.validate_schema(array)).toThrow('Invalid schema: "u8" expected { type, len? }');
     expect(() => utils.validate_schema(arrayFixed)).toThrow('Invalid schema: {"len":2} expected { type, len? }');
-    expect(() => utils.validate_schema(set)).toThrow('Invalid schema: {"type":"u8"} expected option, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
+    expect(() => utils.validate_schema(set)).toThrow('Invalid schema: {"type":"u8"} expected option, enum, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
     expect(() => utils.validate_schema(map)).toThrow('Invalid schema: {"value":"u8"} expected { key, value }');
-    expect(() => utils.validate_schema(option)).toThrow('Invalid schema: null expected option, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
-    expect(() => utils.validate_schema(struct)).toThrow('Invalid schema: {"len":2} expected option, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
-    expect(() => utils.validate_schema(noStruct)).toThrow('Invalid schema: {"u8":"u8"} expected option, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
-    expect(() => utils.validate_schema('u7')).toThrow('Invalid schema: "u7" expected option, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
+    expect(() => utils.validate_schema(option)).toThrow('Invalid schema: null expected option, enum, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
+    expect(() => utils.validate_schema(struct)).toThrow('Invalid schema: {"len":2} expected option, enum, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
+    expect(() => utils.validate_schema(noStruct)).toThrow('Invalid schema: {"u8":"u8"} expected option, enum, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
+    expect(() => utils.validate_schema('u7')).toThrow('Invalid schema: "u7" expected option, enum, array, set, map, struct or u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, bool, string');
     expect(() => utils.validate_schema(Array)).toThrow();
     expect(() => utils.validate_schema(Map)).toThrow();
 });
