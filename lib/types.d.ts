@@ -29,5 +29,5 @@ export type StructType = {
         [key: string]: Schema;
     };
 };
-export type Schema = IntegerType | StringType | ArrayType | SetType | MapType | StructType;
+export type Schema = IntegerType | BoolType | StringType | OptionType | ArrayType | EnumType | SetType | MapType | StructType;
 export type DecodeTypes = number | BN | string | boolean | Array<DecodeTypes> | EnumType | ArrayBuffer | Map<DecodeTypes, DecodeTypes> | Set<DecodeTypes> | object | null;
