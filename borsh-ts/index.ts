@@ -3,6 +3,8 @@ import { BorshSerializer } from './serialize';
 import { BorshDeserializer } from './deserialize';
 import bs58 from 'bs58';
 
+export { Schema } from './types';
+
 export function serialize(schema: Schema, value: unknown): Uint8Array {
     const serializer = new BorshSerializer();
     return serializer.encode(value, schema);
