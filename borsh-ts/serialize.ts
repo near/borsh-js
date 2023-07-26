@@ -37,7 +37,7 @@ export class BorshSerializer {
             this.encoded.store_value(value as number, schema);
         } else {
             utils.expect_BN(value);
-            value = typeof value === 'number'? new BN(value) : value;
+            value = value instanceof BN? value : new BN(value as number | string);
             this.encode_bigint(value as BN, size);
         }
     }

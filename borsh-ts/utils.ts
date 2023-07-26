@@ -24,8 +24,8 @@ export function expect_type(value: unknown, type: string): void {
 }
 
 export function expect_BN(value: unknown): void {
-    if (!(value instanceof BN) && typeof (value) !== 'number') {
-        throw new Error(`Expected BN or number not ${typeof (value)}(${value})`);
+    if (!(value instanceof BN) && typeof (value) !== 'number' && typeof (value) !== 'string') {
+        throw new Error(`Expected BN, number or string not ${typeof (value)}(${value})`);
     }
 }
 
