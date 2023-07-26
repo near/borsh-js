@@ -37,6 +37,7 @@ export class BorshSerializer {
             this.encoded.store_value(value as number, schema);
         } else {
             utils.expect_BN(value);
+            value = typeof value === 'number'? new BN(value) : value;
             this.encode_bigint(value as BN, size);
         }
     }
@@ -167,7 +168,7 @@ export class BorshSerializer {
     encode_struct(value: unknown, schema: StructType): void {
         utils.expect_type(value, 'object');
 
-        for (const key of Object.keys(value)) {
+        for (const key of Object.keys(schema.struct)) {
             this.encode_value(value[key], schema.struct[key]);
         }
     }
