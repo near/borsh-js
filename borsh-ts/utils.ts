@@ -83,7 +83,7 @@ function validate_enum_schema(schema:  Array<StructType>): void {
         }
 
         if (typeof sch.struct !== 'object' || Object.keys(sch.struct).length !== 1) {
-            throw new Error('The "struct" key in enum schema must be an object with a single key');
+            throw new Error('The "struct" in each enum must have a single key');
         }
 
         validate_schema({struct: sch.struct});
