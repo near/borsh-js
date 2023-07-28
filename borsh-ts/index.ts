@@ -1,16 +1,19 @@
 import { Schema, DecodeTypes } from './types';
 import { BorshSerializer } from './serialize';
 import { BorshDeserializer } from './deserialize';
+import * as utils from './utils';
 import bs58 from 'bs58';
 
 export { Schema } from './types';
 
-export function serialize(schema: Schema, value: unknown): Uint8Array {
+export function serialize(schema: Schema, value: unknown, checkSchema = true): Uint8Array {
+    if (checkSchema) utils.validate_schema(schema);
     const serializer = new BorshSerializer();
     return serializer.encode(value, schema);
 }
 
-export function deserialize(schema: Schema, buffer: Uint8Array): DecodeTypes {
+export function deserialize(schema: Schema, buffer: Uint8Array, checkSchema = true): DecodeTypes {
+    if (checkSchema) utils.validate_schema(schema);
     const deserializer = new BorshDeserializer(buffer);
     return deserializer.decode(schema);
 }

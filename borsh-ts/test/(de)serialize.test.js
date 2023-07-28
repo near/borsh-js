@@ -9,7 +9,7 @@ function check_encode(value, schema, expected) {
 
 function check_decode(expected, schema, encoded) {
     const decoded = borsh.deserialize(schema, encoded);
-    
+
     // console.log(decoded, expected); // visual inspection
 
     if (expected && typeof (expected) === 'object' && 'eq' in expected) {
@@ -18,7 +18,7 @@ function check_decode(expected, schema, encoded) {
 
     if (schema === 'f32') return expect(decoded).toBeCloseTo(expected);
 
-    if(expected instanceof Map || expected instanceof Set || expected instanceof Array) {
+    if (expected instanceof Map || expected instanceof Set || expected instanceof Array) {
         return expect(decoded).toEqual(expected);
     }
 
@@ -102,9 +102,30 @@ test('serialize enums', async () => {
     const MyEnumMixture = { mixture: testStructures.Mixture };
 
     const enumSchema = {
-        enum: [{ struct: { numbers: testStructures.schemaNumbers } }, { struct: { mixture: testStructures.schemaMixture } }] 
+        enum: [{ struct: { numbers: testStructures.schemaNumbers } }, { struct: { mixture: testStructures.schemaMixture } }]
     };
 
     check_roundtrip(MyEnumNumbers, enumSchema, [0].concat(testStructures.encodedNumbers));
     check_roundtrip(MyEnumMixture, enumSchema, [1].concat(testStructures.encodedMixture));
+});
+
+test('(de)serialize follows the schema order', async () => {
+    const schema = {
+        struct: { a: 'u8', b: 'u8' }
+    };
+
+    const object = { b: 2, a: 1 };
+    const encoded = [1, 2];
+
+    check_encode(object, schema, encoded);
+    check_decode({ a: 1, b: 2 }, schema, encoded);
+});
+
+test('errors on invalid values', async () => {
+    const schema_array = { array: { type: 'u16' } };
+
+    expect(() => check_encode(['a'], schema_array, [])).toThrow('Expected number not string(a) at value');
+    expect(() => check_encode(3, 'string', [])).toThrow('Expected string not number(3) at value');
+    expect(() => check_encode({ 'a': 1, 'b': '2' }, { struct: { a: 'u8', b: 'u8' } }, [])).toThrow('Expected number not string(2) at value.b');
+    expect(() => check_encode({ 'a': { 'b': { 'c': 3 } } }, { struct: { a: { struct: { b: { struct: { c: 'string' } } } } } }, [])).toThrow('Expected string not number(3) at value.a.b.c');
 });

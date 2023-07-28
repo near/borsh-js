@@ -5,9 +5,9 @@ import * as utils from './utils';
 
 export class BorshSerializer {
     encoded: EncodeBuffer = new EncodeBuffer();
+    fieldPath: string[] = ['value'];
 
     encode(value: unknown, schema: Schema): Uint8Array {
-        utils.validate_schema(schema);
         this.encode_value(value, schema);
         return this.encoded.get_used_buffer();
     }
@@ -33,10 +33,10 @@ export class BorshSerializer {
         const size: number = parseInt(schema.substring(1));
 
         if (size <= 32 || schema == 'f64') {
-            utils.expect_type(value, 'number');
+            utils.expect_type(value, 'number', this.fieldPath);
             this.encoded.store_value(value as number, schema);
         } else {
-            utils.expect_BN(value);
+            utils.expect_BN(value, this.fieldPath);
             value = value instanceof BN? value : new BN(value as number | string);
             this.encode_bigint(value as BN, size);
         }
@@ -60,7 +60,7 @@ export class BorshSerializer {
     }
 
     encode_string(value: unknown): void {
-        utils.expect_type(value, 'string');
+        utils.expect_type(value, 'string', this.fieldPath);
         const _value = value as string;
 
         // 4 bytes for length
@@ -73,7 +73,7 @@ export class BorshSerializer {
     }
 
     encode_boolean(value: unknown): void {
-        utils.expect_type(value, 'boolean');
+        utils.expect_type(value, 'boolean', this.fieldPath);
         this.encoded.store_value(value as boolean ? 1 : 0, 'u8');
     }
 
@@ -87,7 +87,7 @@ export class BorshSerializer {
     }
 
     encode_enum(value: unknown, schema: EnumType): void {
-        utils.expect_enum(value);
+        utils.expect_enum(value, this.fieldPath);
 
         const valueKey = Object.keys(value)[0];
 
@@ -99,18 +99,18 @@ export class BorshSerializer {
                 return this.encode_struct(value, valueSchema as StructType);
             }
         }
-        throw new Error(`Enum key (${valueKey}) not found in enum schema: ${JSON.stringify(schema)}`);
+        throw new Error(`Enum key (${valueKey}) not found in enum schema: ${JSON.stringify(schema)} at ${this.fieldPath.join('.')}`);
     }
 
     encode_array(value: unknown, schema: ArrayType): void {
         if (utils.isArrayLike(value)) return this.encode_arraylike(value as ArrayLike<unknown>, schema);
         if (value instanceof ArrayBuffer) return this.encode_buffer(value, schema);
-        throw new Error(`Expected Array-like not ${typeof (value)}(${value})`);
+        throw new Error(`Expected Array-like not ${typeof (value)}(${value}) at ${this.fieldPath.join('.')}`);
     }
 
     encode_arraylike(value: ArrayLike<unknown>, schema: ArrayType): void {
         if (schema.array.len) {
-            utils.expect_same_size(value.length, schema.array.len);
+            utils.expect_same_size(value.length, schema.array.len, this.fieldPath);
         } else {
             // 4 bytes for length
             this.encoded.store_value(value.length, 'u32');
@@ -124,7 +124,7 @@ export class BorshSerializer {
 
     encode_buffer(value: ArrayBuffer, schema: ArrayType): void {
         if (schema.array.len) {
-            utils.expect_same_size(value.byteLength, schema.array.len);
+            utils.expect_same_size(value.byteLength, schema.array.len, this.fieldPath);
         } else {
             // 4 bytes for length
             this.encoded.store_value(value.byteLength, 'u32');
@@ -135,7 +135,7 @@ export class BorshSerializer {
     }
 
     encode_set(value: unknown, schema: SetType): void {
-        utils.expect_type(value, 'object');
+        utils.expect_type(value, 'object', this.fieldPath);
 
         const isSet = value instanceof Set;
         const values = isSet ? Array.from(value.values()) : Object.values(value);
@@ -150,7 +150,7 @@ export class BorshSerializer {
     }
 
     encode_map(value: unknown, schema: MapType): void {
-        utils.expect_type(value, 'object');
+        utils.expect_type(value, 'object', this.fieldPath);
 
         const isMap = value instanceof Map;
         const keys = isMap ? Array.from(value.keys()) : Object.keys(value);
@@ -166,10 +166,12 @@ export class BorshSerializer {
     }
 
     encode_struct(value: unknown, schema: StructType): void {
-        utils.expect_type(value, 'object');
+        utils.expect_type(value, 'object', this.fieldPath);
 
         for (const key of Object.keys(schema.struct)) {
+            this.fieldPath.push(key);
             this.encode_value(value[key], schema.struct[key]);
+            this.fieldPath.pop();
         }
     }
 }

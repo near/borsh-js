@@ -17,27 +17,27 @@ export function isArrayLike(value: unknown): boolean {
     );
 }
 
-export function expect_type(value: unknown, type: string): void {
+export function expect_type(value: unknown, type: string, fieldPath: string[]): void {
     if (typeof (value) !== type) {
-        throw new Error(`Expected ${type} not ${typeof (value)}(${value})`);
+        throw new Error(`Expected ${type} not ${typeof (value)}(${value}) at ${fieldPath.join('.')}`);
     }
 }
 
-export function expect_BN(value: unknown): void {
+export function expect_BN(value: unknown, fieldPath: string[]): void {
     if (!(value instanceof BN) && typeof (value) !== 'number' && typeof (value) !== 'string') {
-        throw new Error(`Expected BN, number or string not ${typeof (value)}(${value})`);
+        throw new Error(`Expected BN, number or string not ${typeof (value)}(${value}) at ${fieldPath.join('.')}`);
     }
 }
 
-export function expect_same_size(length: number, expected: number): void {
+export function expect_same_size(length: number, expected: number, fieldPath: string[]): void {
     if (length !== expected) {
-        throw new Error(`Array length ${length} does not match schema length ${expected}`);
+        throw new Error(`Array length ${length} does not match schema length ${expected} at ${fieldPath.join('.')}`);
     }
 }
 
-export function expect_enum(value: unknown): void {
+export function expect_enum(value: unknown, fieldPath: string[]): void {
     if(typeof (value) !== 'object' || value === null ) {
-        throw new Error(`Expected object not ${typeof (value)}(${value})`);
+        throw new Error(`Expected object not ${typeof (value)}(${value}) at ${fieldPath.join('.')}`);
     }
 }
 

@@ -1,5 +1,4 @@
 import { ArrayType, DecodeTypes, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers, EnumType } from './types';
-import * as utils from './utils';
 import { DecodeBuffer } from './buffer';
 import BN from 'bn.js';
 
@@ -11,7 +10,6 @@ export class BorshDeserializer {
     }
 
     decode(schema: Schema): DecodeTypes {
-        utils.validate_schema(schema);
         return this.decode_value(schema);
     }
 
