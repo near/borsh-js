@@ -21,8 +21,11 @@ export function deserialize(schema: Schema, buffer: Uint8Array, checkSchema = tr
 // Keeping this for compatibility reasons with the old borsh-js
 export function baseEncode(value: Uint8Array | string): string {
     if (typeof value === 'string') {
-        // create a uint8array from string decoding utf-8 without using Buffer
-        value = new Uint8Array([...value].map((c) => c.charCodeAt(0)));
+        const bytes = [];
+        for(let c = 0; c < value.length; c++){
+            bytes.push(value.charCodeAt(c));
+        }
+        value = new Uint8Array(bytes);
     }
     return bs58.encode(value);
 }

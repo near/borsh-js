@@ -7,7 +7,7 @@
       "dom"
     ],
     "module": "commonjs",
-    "target": "esnext",
+    "target": "ES5",
     "moduleResolution": "node",
     "outDir": "./lib",
     "declaration": true,

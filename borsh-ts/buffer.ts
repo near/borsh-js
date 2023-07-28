@@ -1,10 +1,17 @@
 import { IntegerType } from './types';
 
 export class EncodeBuffer {
-    offset = 0;
-    buffer_size = 256;
-    buffer: ArrayBuffer = new ArrayBuffer(this.buffer_size);
-    view: DataView = new DataView(this.buffer);
+    offset: number;
+    buffer_size: number;
+    buffer: ArrayBuffer;
+    view: DataView;
+
+    constructor() {
+        this.offset = 0;
+        this.buffer_size = 256;
+        this.buffer = new ArrayBuffer(this.buffer_size);
+        this.view = new DataView(this.buffer);
+    }
 
     resize_if_necessary(needed_space: number): void {
         if (this.buffer_size - this.offset < needed_space) {
@@ -40,12 +47,14 @@ export class EncodeBuffer {
 }
 
 export class DecodeBuffer {
-    offset = 0;
-    buffer_size = 256;
+    offset: number;
+    buffer_size: number;
     buffer: ArrayBuffer;
     view: DataView;
 
     constructor(buf: Uint8Array) {
+        this.offset = 0;
+        this.buffer_size = buf.length;
         this.buffer = new ArrayBuffer(buf.length);
         new Uint8Array(this.buffer).set(buf);
         this.view = new DataView(this.buffer);

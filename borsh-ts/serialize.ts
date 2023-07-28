@@ -4,8 +4,13 @@ import BN from 'bn.js';
 import * as utils from './utils';
 
 export class BorshSerializer {
-    encoded: EncodeBuffer = new EncodeBuffer();
-    fieldPath: string[] = ['value'];
+    encoded: EncodeBuffer;
+    fieldPath: string[];
+
+    constructor() { 
+        this.encoded = new EncodeBuffer();
+        this.fieldPath = ['value'];
+    }
 
     encode(value: unknown, schema: Schema): Uint8Array {
         this.encode_value(value, schema);
