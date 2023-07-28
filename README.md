@@ -31,24 +31,11 @@ const decodedStr = borsh.deserialize('string', encodedStr);
 import * as borsh from 'borsh';
 import BN from 'bn.js';
 
-const value = new Test({x: 255, y: new BN(20), z: '123', arr: [1, 2, 3]});
+const value = {x: 255, y: new BN(20), z: '123', arr: [1, 2, 3]};
 const schema = { struct: { x: 'u8', y: 'u64', 'z': 'string', 'arr': { array: { type: 'u8' }}}};
 
 const encoded = borsh.serialize(schema, value);
 const decoded = borsh.deserialize(schema, encoded);
-```
-
-### (De)serializing a Class Instance
-```javascript
-import * as borsh from 'borsh';
-import BN from 'bn.js';
-
-class Test{ constructor({x, y, z, arr}){ Object.assign(this, {x, y, z, arr}) }}
-const value = new Test({x: 255, y: new BN(20), z: '123', arr: [1, 2, 3]});
-const schema = { struct: { x: 'u8', y: 'u64', 'z': 'string', 'arr': { array: { type: 'u8' }}}};
-
-const encoded = borsh.serialize(schema, value);
-const decoded = borsh.deserialize(schema, encoded, Test); // decoded is an instance of Test
 ```
 
 ## API
@@ -70,12 +57,13 @@ Basic types are described by a string. The following types are supported:
 - `bool` - boolean value.
 - `string` - UTF-8 string.
 
-### Arrays, Options, Maps, Sets, and Structs
+### Arrays, Options, Maps, Sets, Enums, and Structs
 More complex objects are described by a JSON object. The following types are supported:
 - `{ array: { type: Schema, len?: number } }` - an array of objects of the same type. The type of the array elements is described by the `type` field. If the field `len` is present, the array is fixed-size and the length of the array is `len`. Otherwise, the array is dynamic-sized and the length of the array is serialized before the elements.
 - `{ option: Schema }` - an optional object. The type of the object is described by the `type` field.
 - `{ map: { key: Schema, value: Schema }}` - a map. The type of the keys and values are described by the `key` and `value` fields respectively.
 - `{ set: Schema }` - a set. The type of the elements is described by the `type` field.
+- `{ enum: [{ className1: { struct: {...} } }, { className2: { struct: {...} } }, ... ] }` - an enum. The variants of the enum are described by the `className1`, `className2`, etc. fields. The variants are structs.
 - `{ struct: { field1: Schema1, field2: Schema2, ... } }` - a struct. The fields of the struct are described by the `field1`, `field2`, etc. fields.
 
 ### Type Mappings
@@ -90,7 +78,7 @@ More complex objects are described by a JSON object. The following types are sup
 | `string`                                   | UTF-8 string                      |
 | `type[]`                                   | fixed-size byte array             |
 | `type[]`                                   | dynamic sized array               |
-| N/A                                        | enum                              |
+| `object`                                   | enum                              |
 | `Map`                                      | HashMap                           |
 | `Set`                                      | HashSet                           |
 | `null` or `type`                           | Option                            |
