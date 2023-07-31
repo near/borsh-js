@@ -1,5 +1,5 @@
 const BN = require('bn.js');
-const borsh = require('../../lib/index');
+const borsh = require('../../lib/cjs/index');
 const testStructures = require('./structures');
 
 function check_encode(value, schema, expected) {

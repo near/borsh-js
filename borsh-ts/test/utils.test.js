@@ -1,4 +1,4 @@
-const utils = require('../../lib/utils');
+const utils = require('../../lib/cjs/utils');
 
 test('accept valid schemes', async () => {
     const array = { array: { type: 'u8' } };

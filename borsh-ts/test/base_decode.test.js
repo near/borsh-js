@@ -1,4 +1,4 @@
-const borsh = require('../../lib/index');
+const borsh = require('../../lib/cjs/index');
 
 test('baseEncode string test', async () => {
     const encodedValue = borsh.baseEncode('244ZQ9cgj3CQ6bWBdytfrJMuMQ1jdXLFGnr4HhvtCTnM');
