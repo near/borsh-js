@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { Schema, StructType, integers } from './types';
+import { Schema, StructType, integers } from './types.js';
 
 export function isArrayLike(value: unknown): boolean {
     // source: https://stackoverflow.com/questions/24048547/checking-if-an-object-is-array-like

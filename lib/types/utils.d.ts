@@ -1,4 +1,4 @@
-import { Schema } from './types';
+import { Schema } from './types.js';
 export declare function isArrayLike(value: unknown): boolean;
 export declare function expect_type(value: unknown, type: string, fieldPath: string[]): void;
 export declare function expect_BN(value: unknown, fieldPath: string[]): void;

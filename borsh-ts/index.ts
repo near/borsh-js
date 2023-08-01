@@ -1,7 +1,7 @@
-import { Schema, DecodeTypes } from './types';
-import { BorshSerializer } from './serialize';
-import { BorshDeserializer } from './deserialize';
-import * as utils from './utils';
+import { Schema, DecodeTypes } from './types.js';
+import { BorshSerializer } from './serialize.js';
+import { BorshDeserializer } from './deserialize.js';
+import * as utils from './utils.js';
 import bs58 from 'bs58';
 
 export { Schema } from './types';
