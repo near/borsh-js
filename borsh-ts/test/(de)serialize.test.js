@@ -8,14 +8,8 @@ function check_encode(value, schema, expected) {
 
 function check_decode(expected, schema, encoded) {
     const decoded = borsh.deserialize(schema, encoded);
-
     // console.log(decoded, expected); // visual inspection
     if (schema === 'f32') return expect(decoded).toBeCloseTo(expected);
-
-    if (expected instanceof Map || expected instanceof Set || expected instanceof Array) {
-        return expect(decoded).toEqual(expected);
-    }
-
     expect(decoded).toEqual(expected);
 }
 
