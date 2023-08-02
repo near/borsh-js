@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 export declare const integers: string[];
 export type IntegerType = typeof integers[number];
 export type BoolType = 'bool';
@@ -30,4 +29,4 @@ export type StructType = {
     };
 };
 export type Schema = IntegerType | BoolType | StringType | OptionType | ArrayType | EnumType | SetType | MapType | StructType;
-export type DecodeTypes = number | BN | string | boolean | Array<DecodeTypes> | EnumType | ArrayBuffer | Map<DecodeTypes, DecodeTypes> | Set<DecodeTypes> | object | null;
+export type DecodeTypes = number | bigint | string | boolean | Array<DecodeTypes> | EnumType | ArrayBuffer | Map<DecodeTypes, DecodeTypes> | Set<DecodeTypes> | object | null;

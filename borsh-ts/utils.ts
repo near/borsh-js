@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import { Schema, StructType, integers } from './types.js';
 
 export function isArrayLike(value: unknown): boolean {
@@ -24,7 +23,7 @@ export function expect_type(value: unknown, type: string, fieldPath: string[]): 
 }
 
 export function expect_BN(value: unknown, fieldPath: string[]): void {
-    if (!(value instanceof BN) && typeof (value) !== 'number' && typeof (value) !== 'string') {
+    if (!['number', 'string', 'bigint'].includes(typeof(value))) {
         throw new Error(`Expected BN, number or string not ${typeof (value)}(${value}) at ${fieldPath.join('.')}`);
     }
 }

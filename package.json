@@ -1,6 +1,6 @@
 {
   "name": "borsh",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Binary Object Representation Serializer for Hashing",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
@@ -48,16 +48,11 @@
   "devDependencies": {
     "@types/babel__core": "^7.1.2",
     "@types/babel__template": "^7.0.2",
-    "@types/bn.js": "^5.1.0",
     "@types/node": "^12.7.3",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.17.0",
     "jest": "^26.0.1",
     "typescript": "^4"
-  },
-  "dependencies": {
-    "bn.js": "^5.2.0",
-    "bs58": "^4.0.0"
   }
 }

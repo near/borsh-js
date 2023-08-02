@@ -1,13 +1,12 @@
 import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers, EnumType } from './types.js';
 import { EncodeBuffer } from './buffer.js';
-import BN from 'bn.js';
 import * as utils from './utils.js';
 
 export class BorshSerializer {
     encoded: EncodeBuffer;
     fieldPath: string[];
 
-    constructor() { 
+    constructor() {
         this.encoded = new EncodeBuffer();
         this.fieldPath = ['value'];
     }
@@ -42,23 +41,18 @@ export class BorshSerializer {
             this.encoded.store_value(value as number, schema);
         } else {
             utils.expect_BN(value, this.fieldPath);
-            value = value instanceof BN? value : new BN(value as number | string);
-            this.encode_bigint(value as BN, size);
+            value = value instanceof BigInt ? value : BigInt(value as number | string);
+            this.encode_bigint(value as bigint, size);
         }
     }
 
-    encode_bigint(value: BN, size: number): void {
+    encode_bigint(value: bigint, size: number): void {
         const buffer_len = size / 8;
-        const buffer = value.toArray('le', buffer_len);
+        const buffer = new Uint8Array(buffer_len);
 
-        if (value.lt(new BN(0))) {
-            // compute two's complement
-            let carry = 1;
-            for (let i = 0; i < buffer_len; i++) {
-                const v = (buffer[i] ^ 0xff) + carry;
-                carry = v >> 8;
-                buffer[i] = v & 0xff;
-            }
+        for (let i = 0; i < buffer_len; i++) {
+            buffer[i] = Number(value & BigInt(0xff));
+            value = value >> BigInt(8);
         }
 
         this.encoded.store_bytes(new Uint8Array(buffer));

@@ -1,4 +1,3 @@
-const BN = require('bn.js');
 const borsh = require('../../lib/cjs/index');
 const testStructures = require('./structures');
 
@@ -11,18 +10,13 @@ function check_decode(expected, schema, encoded) {
     const decoded = borsh.deserialize(schema, encoded);
 
     // console.log(decoded, expected); // visual inspection
-
-    if (expected && typeof (expected) === 'object' && 'eq' in expected) {
-        return expect(expected.eq(decoded)).toBe(true);
-    }
-
     if (schema === 'f32') return expect(decoded).toBeCloseTo(expected);
 
     if (expected instanceof Map || expected instanceof Set || expected instanceof Array) {
         return expect(decoded).toEqual(expected);
     }
 
-    expect(JSON.stringify(decoded)).toEqual(JSON.stringify(expected));
+    expect(decoded).toEqual(expected);
 }
 
 function check_roundtrip(value, schema, encoded) {
@@ -34,13 +28,13 @@ test('serialize integers', async () => {
     check_roundtrip(100, 'u8', [100]);
     check_roundtrip(258, 'u16', [2, 1]);
     check_roundtrip(102, 'u32', [102, 0, 0, 0]);
-    check_roundtrip(new BN(103), 'u64', [103, 0, 0, 0, 0, 0, 0, 0]);
-    check_roundtrip(new BN(104), 'u128', [104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    check_roundtrip(103n, 'u64', [103, 0, 0, 0, 0, 0, 0, 0]);
+    check_roundtrip(104n, 'u128', [104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     check_roundtrip(-100, 'i8', [156]);
     check_roundtrip(-258, 'i16', [254, 254]);
     check_roundtrip(-102, 'i32', [154, 255, 255, 255]);
-    check_roundtrip(new BN(-103), 'i64', [153, 255, 255, 255, 255, 255, 255, 255]);
-    check_roundtrip(new BN(-104), 'i128', [152, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]);
+    check_roundtrip(-103n, 'i64', [153, 255, 255, 255, 255, 255, 255, 255]);
+    check_roundtrip(-104n, 'i128', [152, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]);
 });
 
 test('serialize booleans', async () => {

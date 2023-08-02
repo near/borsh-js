@@ -1,16 +1,14 @@
-const BN = require('bn.js');
-
 // Complex number structure
 const Numbers = {
     u8: 1,
     u16: 2,
     u32: 3,
-    u64: new BN(4),
-    u128: new BN(5),
+    u64: 4n,
+    u128: 5n,
     i8: -1,
     i16: -2,
     i32: -3,
-    i64: new BN(-4),
+    i64: -4n,
     f32: 6.0,
     f64: 7.1,
 };
@@ -61,17 +59,17 @@ const encodedNested = [1, 2, 0, 3, 0, 0, 0];
 const Mixture = {
     foo: 321,
     bar: 123,
-    u64Val: new BN('4294967297'),
-    i64Val: new BN(-64),
+    u64Val: BigInt('4294967297'),
+    i64Val: -64n,
     flag: true,
     baz: 'testing',
     uint8array: [240, 241],
     arr: [['testing'], ['testing']],
     u32Arr: [21, 11],
     i32Arr: [],
-    u128Val: new BN(128),
+    u128Val: 128n,
     uint8arrays: [[240, 241], [240, 241]],
-    u64Arr: [new BN('10000000000'), new BN('100000000000')],
+    u64Arr: [BigInt('10000000000'), 100000000000n],
 };
 
 const schemaMixture = {
@@ -114,8 +112,8 @@ const encodedMixture = [
 
 // A structure of big nums
 const BigStruct = {
-    u64: new BN('ffffffffffffffff', 'hex'),
-    u128: new BN('ffffffffffffffff'.repeat(2), 'hex'),
+    u64: BigInt('18446744073709551615'),
+    u128: BigInt('340282366920938463463374607431768211455'),
     arr: [...Array(254).keys()],
 };
 

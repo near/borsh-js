@@ -1,6 +1,5 @@
 import { ArrayType, DecodeTypes, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers, EnumType } from './types.js';
 import { DecodeBuffer } from './buffer.js';
-import BN from 'bn.js';
 
 export class BorshDeserializer {
     buffer: DecodeBuffer;
@@ -32,7 +31,7 @@ export class BorshDeserializer {
         throw new Error(`Unsupported type: ${schema}`);
     }
 
-    decode_integer(schema: IntegerType): number | BN {
+    decode_integer(schema: IntegerType): number | bigint {
         const size: number = parseInt(schema.substring(1));
 
         if (size <= 32 || schema == 'f64') {
@@ -41,22 +40,15 @@ export class BorshDeserializer {
         return this.decode_bigint(size, schema.startsWith('i'));
     }
 
-    decode_bigint(size: number, signed = false): BN {
+    decode_bigint(size: number, signed = false): bigint {
         const buffer_len = size / 8;
         const buffer = new Uint8Array(this.buffer.consume_bytes(buffer_len));
+        const bits = buffer.reduceRight((r, x) => r + x.toString(16).padStart(2, '0'), '');
 
         if (signed && buffer[buffer_len - 1]) {
-            // negative number
-            let carry = 1;
-            for (let i = 0; i < buffer_len; i++) {
-                const v = (buffer[i] ^ 0xff) + carry;
-                buffer[i] = v & 0xff;
-                carry = v >> 8;
-            }
-            return new BN(buffer, 'le').mul(new BN(-1));
+            return BigInt.asIntN(size, BigInt(`0x${bits}`));
         }
-
-        return new BN(buffer, 'le');
+        return BigInt(`0x${bits}`);
     }
 
     decode_string(): string {
