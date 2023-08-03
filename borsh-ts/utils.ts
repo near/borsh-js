@@ -23,7 +23,9 @@ export function expect_type(value: unknown, type: string, fieldPath: string[]): 
 }
 
 export function expect_bigint(value: unknown, fieldPath: string[]): void {
-    if (!['number', 'string', 'bigint', 'boolean'].includes(typeof(value))) {
+    const basicType = ['number', 'string', 'bigint', 'boolean'].includes(typeof(value));
+    const strObject = typeof (value) === 'object' && value !== null && 'toString' in value;
+    if (!basicType && !strObject) {
         throw new Error(`Expected bigint, number, boolean or string not ${typeof (value)}(${value}) at ${fieldPath.join('.')}`);
     }
 }

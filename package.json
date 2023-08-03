@@ -53,6 +53,7 @@
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.17.0",
     "jest": "^26.0.1",
-    "typescript": "^4"
+    "typescript": "^4",
+    "bn.js": "^5.2.0"
   }
 }

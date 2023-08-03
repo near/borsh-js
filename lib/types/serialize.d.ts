@@ -3,7 +3,8 @@ import { EncodeBuffer } from './buffer.js';
 export declare class BorshSerializer {
     encoded: EncodeBuffer;
     fieldPath: string[];
-    constructor();
+    checkTypes: boolean;
+    constructor(checkTypes: any);
     encode(value: unknown, schema: Schema): Uint8Array;
     encode_value(value: unknown, schema: Schema): void;
     encode_integer(value: unknown, schema: IntegerType): void;
