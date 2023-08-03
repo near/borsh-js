@@ -29,9 +29,8 @@ const decodedStr = borsh.deserialize('string', encodedStr);
 ### (De)serializing an Object
 ```javascript
 import * as borsh from 'borsh';
-import BN from 'bn.js';
 
-const value = {x: 255, y: new BN(20), z: '123', arr: [1, 2, 3]};
+const value = {x: 255, y: BigInt(20), z: '123', arr: [1, 2, 3]};
 const schema = { struct: { x: 'u8', y: 'u64', 'z': 'string', 'arr': { array: { type: 'u8' }}}};
 
 const encoded = borsh.serialize(schema, value);
@@ -68,20 +67,20 @@ More complex objects are described by a JSON object. The following types are sup
 
 ### Type Mappings
 
-| Javascript                                 | Borsh                             |
-|--------------------------------------------|-----------------------------------|
-| `number`                                   | `u8` `u16` `u32` `i8` `i16` `i32` |
-| [`BN`](https://github.com/indutny/bn.js/)  | `u64` `u128` `i64` `i128`         |
-| `number`                                   | `f32` `f64`                       |
-| `number`                                   | `f32` `f64`                       |
-| `boolean`                                  | `bool`                            |
-| `string`                                   | UTF-8 string                      |
-| `type[]`                                   | fixed-size byte array             |
-| `type[]`                                   | dynamic sized array               |
-| `object`                                   | enum                              |
-| `Map`                                      | HashMap                           |
-| `Set`                                      | HashSet                           |
-| `null` or `type`                           | Option                            |
+| Javascript       | Borsh                             |
+|------------------|-----------------------------------|
+| `number`         | `u8` `u16` `u32` `i8` `i16` `i32` |
+| `bigint`         | `u64` `u128` `i64` `i128`         |
+| `number`         | `f32` `f64`                       |
+| `number`         | `f32` `f64`                       |
+| `boolean`        | `bool`                            |
+| `string`         | UTF-8 string                      |
+| `type[]`         | fixed-size byte array             |
+| `type[]`         | dynamic sized array               |
+| `object`         | enum                              |
+| `Map`            | HashMap                           |
+| `Set`            | HashSet                           |
+| `null` or `type` | Option                            |
 
 
 ---

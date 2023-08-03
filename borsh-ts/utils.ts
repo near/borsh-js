@@ -22,9 +22,9 @@ export function expect_type(value: unknown, type: string, fieldPath: string[]): 
     }
 }
 
-export function expect_BN(value: unknown, fieldPath: string[]): void {
-    if (!['number', 'string', 'bigint'].includes(typeof(value))) {
-        throw new Error(`Expected BN, number or string not ${typeof (value)}(${value}) at ${fieldPath.join('.')}`);
+export function expect_bigint(value: unknown, fieldPath: string[]): void {
+    if (!['number', 'string', 'bigint', 'boolean'].includes(typeof(value))) {
+        throw new Error(`Expected bigint, number, boolean or string not ${typeof (value)}(${value}) at ${fieldPath.join('.')}`);
     }
 }
 

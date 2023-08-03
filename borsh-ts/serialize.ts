@@ -40,9 +40,8 @@ export class BorshSerializer {
             utils.expect_type(value, 'number', this.fieldPath);
             this.encoded.store_value(value as number, schema);
         } else {
-            utils.expect_BN(value, this.fieldPath);
-            value = value instanceof BigInt ? value : BigInt(value as number | string);
-            this.encode_bigint(value as bigint, size);
+            utils.expect_bigint(value, this.fieldPath);
+            this.encode_bigint(BigInt(value as string), size);
         }
     }
 
