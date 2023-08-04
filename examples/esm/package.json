@@ -1,0 +1,11 @@
+{
+  "name": "esm-example",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "borsh-js": "file:../../"
+  }
+}

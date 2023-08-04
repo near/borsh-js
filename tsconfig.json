@@ -1,15 +1,7 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "lib": [
-      "es2015",
-      "esnext",
-      "dom"
-    ],
-    "module": "commonjs",
-    "target": "esnext",
     "moduleResolution": "node",
-    "outDir": "./lib",
     "declaration": true,
     "preserveSymlinks": true,
     "preserveWatchOutput": true,

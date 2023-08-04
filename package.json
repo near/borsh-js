@@ -1,22 +1,31 @@
 {
   "name": "borsh",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "description": "Binary Object Representation Serializer for Hashing",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/types/index.d.ts",
   "files": [
     "lib",
     "LICENSE-APACHE",
     "LICENSE-MIT.txt"
   ],
   "scripts": {
-    "build": "tsc -p ./tsconfig.json",
     "test": "jest test --runInBand",
-    "fuzz": "jsfuzz borsh-ts/test/fuzz/borsh-roundtrip.js borsh-ts/test/fuzz/corpus/",
-    "dev": "yarn build -w",
     "pretest": "yarn build",
     "lint": "eslint borsh-ts/**/*.ts",
-    "fix": "eslint borsh-ts/**/*.ts --fix"
+    "fix": "eslint borsh-ts/**/*.ts --fix",
+    "compile": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json",
+    "build:clean": "rm -rf ./lib",
+    "build": "npm run build:clean && npm run compile && node .build_scripts/prepare-package-json.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "require": "./lib/cjs/index.js",
+      "import": "./lib/esm/index.js",
+      "default": "./lib/esm/index.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -39,21 +48,12 @@
   "devDependencies": {
     "@types/babel__core": "^7.1.2",
     "@types/babel__template": "^7.0.2",
-    "@types/bn.js": "^5.1.0",
     "@types/node": "^12.7.3",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
-    "bs58": "^4.0.0",
     "eslint": "^8.17.0",
     "jest": "^26.0.1",
-    "js-sha256": "^0.9.0",
-    "jsfuzz": "^1.0.14",
-    "typescript": "^4"
-  },
-  "dependencies": {
-    "bn.js": "^5.2.0",
-    "bs58": "^4.0.0",
-    "buffer": "^6.0.3",
-    "text-encoding-utf-8": "^1.0.2"
+    "typescript": "^4",
+    "bn.js": "^5.2.0"
   }
 }
