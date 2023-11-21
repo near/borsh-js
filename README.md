@@ -62,7 +62,7 @@ More complex objects are described by a JSON object. The following types are sup
 - `{ option: Schema }` - an optional object. The type of the object is described by the `type` field.
 - `{ map: { key: Schema, value: Schema }}` - a map. The type of the keys and values are described by the `key` and `value` fields respectively.
 - `{ set: Schema }` - a set. The type of the elements is described by the `type` field.
-- `{ enum: [{ struct: {...} }, { struct: {...} }, ... ] }` - an enum. The variants of the enum are described by the `className1`, `className2`, etc. fields. The variants are structs.
+- `{ enum: [ { struct: { className1: structSchema1 } }, { struct: { className2: structSchema2 } }, ... ] }` - an enum. The variants of the enum are described by the `className1`, `className2`, etc. fields. The variants are structs.
 - `{ struct: { field1: Schema1, field2: Schema2, ... } }` - a struct. The fields of the struct are described by the `field1`, `field2`, etc. fields.
 
 ### Type Mappings
