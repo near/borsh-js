@@ -1,6 +1,8 @@
 import { ArrayType, DecodeTypes, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers, EnumType } from './types.js';
 import { DecodeBuffer } from './buffer.js';
 
+import * as utfUtil from 'util';
+
 export class BorshDeserializer {
     buffer: DecodeBuffer;
 
@@ -54,7 +56,7 @@ export class BorshDeserializer {
     decode_string(): string {
         const len: number = this.decode_integer('u32') as number;
         const buffer = new Uint8Array(this.buffer.consume_bytes(len));
-        return String.fromCharCode.apply(null, buffer);
+        return new utfUtil.TextDecoder().decode(buffer);
     }
 
     decode_boolean(): boolean {

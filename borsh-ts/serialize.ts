@@ -2,6 +2,8 @@ import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructTyp
 import { EncodeBuffer } from './buffer.js';
 import * as utils from './utils.js';
 
+import * as utfUtil from 'util';
+
 export class BorshSerializer {
     encoded: EncodeBuffer;
     fieldPath: string[];
@@ -61,15 +63,13 @@ export class BorshSerializer {
 
     encode_string(value: unknown): void {
         this.checkTypes && utils.expect_type(value, 'string', this.fieldPath);
-        const _value = value as string;
 
-        // 4 bytes for length
-        this.encoded.store_value(_value.length, 'u32');
+        // encode to utf8 bytes
+        const utf8Bytes = new utfUtil.TextEncoder().encode(value as string);
 
-        // string bytes
-        for (let i = 0; i < _value.length; i++) {
-            this.encoded.store_value(_value.charCodeAt(i), 'u8');
-        }
+        // 4 bytes for length + string bytes
+        this.encoded.store_value(utf8Bytes.length, 'u32');
+        this.encoded.store_bytes(utf8Bytes);
     }
 
     encode_boolean(value: unknown): void {

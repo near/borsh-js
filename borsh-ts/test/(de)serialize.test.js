@@ -40,6 +40,9 @@ test('serialize booleans', async () => {
 
 test('serialize strings', async () => {
     check_roundtrip('h"i', 'string', [3, 0, 0, 0, 104, 34, 105]);
+    check_roundtrip('Chévere', 'string', [8, 0, 0, 0, 67, 104, 195, 169, 118, 101, 114, 101]);
+    check_roundtrip('👍', 'string', [4, 0, 0, 0, 240, 159, 145, 141]);
+    check_roundtrip('óñ 漢', 'string', [8, 0, 0, 0, 195, 179, 195, 177, 32, 230, 188, 162]);
 });
 
 test('serialize floats', async () => {
