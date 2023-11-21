@@ -1,7 +1,7 @@
-import { Schema, DecodeTypes } from './types.js';
-import { BorshSerializer } from './serialize.js';
-import { BorshDeserializer } from './deserialize.js';
-import * as utils from './utils.js';
+import { Schema } from './types';
+import { BorshSerializer } from './serialize';
+import { BorshDeserializer } from './deserialize';
+import * as utils from './utils';
 
 export { Schema } from './types';
 
@@ -11,8 +11,8 @@ export function serialize(schema: Schema, value: unknown, validate = true): Uint
     return serializer.encode(value, schema);
 }
 
-export function deserialize(schema: Schema, buffer: Uint8Array, validate = true): DecodeTypes {
+export function deserialize<T>(schema: Schema, buffer: Uint8Array, validate = true): T {
     if (validate) utils.validate_schema(schema);
     const deserializer = new BorshDeserializer(buffer);
-    return deserializer.decode(schema);
+    return deserializer.decode(schema) as T;
 }

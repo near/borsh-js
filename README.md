@@ -39,8 +39,8 @@ const decoded = borsh.deserialize(schema, encoded);
 
 ## API
 The package exposes the following functions:
-- `serialize(schema: Schema, obj: any): Uint8Array` - serializes an object `obj` according to the schema `schema`.
-- `deserialize(schema: Schema, buffer: Uint8Array, class?: Class): any` - deserializes an object according to the schema `schema` from the buffer `buffer`. If the optional parameter `class` is present, the deserialized object will be an of `class`.
+- `serialize(schema: Schema, obj: any, validate: bool = true): Uint8Array` - serializes an object `obj` according to the schema `schema`. If the optional parameter `validate` is set to false, no validation of the `schema` will be made against the object.
+- `deserialize<T>(schema: Schema, buffer: Uint8Array, validate: bool = true): T` - deserializes an object according to the schema `schema` from the buffer `buffer`. If the optional parameter `validate` is set to false, no validation of the `schema` will be made against the object.
 
 ## Schemas
 Schemas are used to describe the structure of the data being serialized or deserialized. They are used to

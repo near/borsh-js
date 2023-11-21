@@ -119,3 +119,19 @@ test('errors on invalid values', async () => {
     expect(() => check_encode({ 'a': 1, 'b': '2' }, { struct: { a: 'u8', b: 'u8' } }, [])).toThrow('Expected number not string(2) at value.b');
     expect(() => check_encode({ 'a': { 'b': { 'c': 3 } } }, { struct: { a: { struct: { b: { struct: { c: 'string' } } } } } }, [])).toThrow('Expected string not number(3) at value.a.b.c');
 });
+
+test('(de)serialize follows the schema order', async () => {
+    let data = { value: 'test' };
+
+    const MyTypeSchema = {
+        struct: {
+            value: 'string'
+        }
+    };
+
+    const serialized = borsh.serialize(MyTypeSchema, data);
+
+    // No explicit type
+    const myTypeInstance_1 = borsh.deserialize(MyTypeSchema, serialized);
+    expect(myTypeInstance_1.value).toBe('test');
+});

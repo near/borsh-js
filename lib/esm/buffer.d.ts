@@ -1,4 +1,4 @@
-import { IntegerType } from './types.js';
+import { IntegerType } from './types';
 export declare class EncodeBuffer {
     offset: number;
     buffer_size: number;

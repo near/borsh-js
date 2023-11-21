@@ -1,5 +1,5 @@
-import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType, EnumType } from './types.js';
-import { EncodeBuffer } from './buffer.js';
+import { ArrayType, MapType, IntegerType, OptionType, Schema, SetType, StructType, EnumType } from './types';
+import { EncodeBuffer } from './buffer';
 export declare class BorshSerializer {
     encoded: EncodeBuffer;
     fieldPath: string[];

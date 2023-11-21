@@ -1,4 +1,4 @@
-import { Schema, StructType, integers } from './types.js';
+import { Schema, StructType, integers } from './types';
 
 export function isArrayLike(value: unknown): boolean {
     // source: https://stackoverflow.com/questions/24048547/checking-if-an-object-is-array-like

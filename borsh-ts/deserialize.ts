@@ -1,5 +1,5 @@
-import { ArrayType, DecodeTypes, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers, EnumType } from './types.js';
-import { DecodeBuffer } from './buffer.js';
+import { ArrayType, DecodeTypes, MapType, IntegerType, OptionType, Schema, SetType, StructType, integers, EnumType } from './types';
+import { DecodeBuffer } from './buffer';
 
 export class BorshDeserializer {
     buffer: DecodeBuffer;
