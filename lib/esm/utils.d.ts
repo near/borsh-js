@@ -8,3 +8,4 @@ export declare class ErrorSchema extends Error {
     constructor(schema: Schema, expected: string);
 }
 export declare function validate_schema(schema: Schema): void;
+export declare function encodeCodePoint(codePoint: any): number[];
