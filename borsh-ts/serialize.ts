@@ -63,13 +63,32 @@ export class BorshSerializer {
         this.checkTypes && utils.expect_type(value, 'string', this.fieldPath);
         const _value = value as string;
 
-        // 4 bytes for length
-        this.encoded.store_value(_value.length, 'u32');
-
-        // string bytes
+        // encode to utf8 bytes without using TextEncoder
+        const utf8Bytes: number[] = [];
         for (let i = 0; i < _value.length; i++) {
-            this.encoded.store_value(_value.charCodeAt(i), 'u8');
+            let charCode = _value.charCodeAt(i);
+
+            if (charCode < 0x80) {
+                utf8Bytes.push(charCode);
+            } else if (charCode < 0x800) {
+                utf8Bytes.push(0xc0 | (charCode >> 6), 0x80 | (charCode & 0x3f));
+            } else if (charCode < 0xd800 || charCode >= 0xe000) {
+                utf8Bytes.push(0xe0 | (charCode >> 12), 0x80 | ((charCode >> 6) & 0x3f), 0x80 | (charCode & 0x3f));
+            } else {
+                i++;
+                charCode = 0x10000 + (((charCode & 0x3ff) << 10) | (_value.charCodeAt(i) & 0x3ff));
+                utf8Bytes.push(
+                    0xf0 | (charCode >> 18),
+                    0x80 | ((charCode >> 12) & 0x3f),
+                    0x80 | ((charCode >> 6) & 0x3f),
+                    0x80 | (charCode & 0x3f),
+                );
+            }
         }
+
+        // 4 bytes for length + string bytes
+        this.encoded.store_value(utf8Bytes.length, 'u32');
+        this.encoded.store_bytes(new Uint8Array(utf8Bytes));
     }
 
     encode_boolean(value: unknown): void {

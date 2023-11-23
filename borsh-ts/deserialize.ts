@@ -54,7 +54,26 @@ export class BorshDeserializer {
     decode_string(): string {
         const len: number = this.decode_integer('u32') as number;
         const buffer = new Uint8Array(this.buffer.consume_bytes(len));
-        return String.fromCharCode.apply(null, buffer);
+
+        // decode utf-8 string without using TextDecoder
+        // first get all bytes to single byte code points
+        const codePoints = [];
+        for (let i = 0; i < len; ++i) {
+            const byte = buffer[i];
+            if (byte < 0x80) {
+                codePoints.push(byte);
+            } else if (byte < 0xE0) {
+                codePoints.push(((byte & 0x1F) << 6) | (buffer[++i] & 0x3F));
+            } else if (byte < 0xF0) {
+                codePoints.push(((byte & 0x0F) << 12) | ((buffer[++i] & 0x3F) << 6) | (buffer[++i] & 0x3F));
+            } else {
+                const codePoint = ((byte & 0x07) << 18) | ((buffer[++i] & 0x3F) << 12) | ((buffer[++i] & 0x3F) << 6) | (buffer[++i] & 0x3F);
+                codePoints.push(codePoint);
+            }
+        }
+
+        // then decode code points to utf-8
+        return String.fromCodePoint(...codePoints);
     }
 
     decode_boolean(): boolean {
