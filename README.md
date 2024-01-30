@@ -13,6 +13,9 @@ JavaScript and TypeScript projects.
 Borsh stands for _Binary Object Representation Serializer for Hashing_. It is meant to be used in security-critical projects as it prioritizes consistency,
 safety, speed, and comes with a strict specification.
 
+> [!TIP]
+> We strongly recommend to use `borsh-js` alongside the amazing project [Borsher](https://github.com/nameskyteam/borsher), which we plan to merge in borsh.
+
 ## Examples
 
 ### (De)serializing a Value
@@ -46,7 +49,11 @@ The package exposes the following functions:
 Schemas are used to describe the structure of the data being serialized or deserialized. They are used to
 validate the data and to determine the order of the fields in the serialized data.
 
-> NOTE: You can find examples of valid in the [test](./borsh-ts/test/utils.test.js) folder.
+> You can find examples of valid in the [test](./borsh-ts/test/utils.test.js) folder.
+
+> [!TIP]
+> We strongly recommend to use `borsh-js` alongside the amazing project [Borsher](https://github.com/nameskyteam/borsher), which we plan to merge in borsh.
+
 
 ### Basic Types
 Basic types are described by a string. The following types are supported:
