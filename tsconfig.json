@@ -1,9 +1,14 @@
 {
   "include": [
-    "src"
+    "packages/*/src",
+    "packages/*/*/src",
+    "packages/*/*/*/src"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "packages/*/node_modules",
+    "packages/*/*/node_modules",
+    "packages/*/*/*/node_modules"
   ],
   "compilerOptions": {
     "lib": [
@@ -11,20 +16,17 @@
       "DOM",
       "ES2022.Error",
     ], /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-    "rootDir": "src", /* Specify the root folder within your source files. */
+    "rootDir": ".", /* Monorepo: allow packages/* paths without rootDir errors */
     "esModuleInterop": true, /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */
     "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
     /* Type Checking */
     "noImplicitAny": true, /* Enable error reporting for expressions and declarations with an implied `any` type.. */
     "skipLibCheck": true, /* Skip type checking all .d.ts files. */
     "target": "ES2020",
-    "module": "ES2022",
-    "outDir": "lib/esm",
-    "declaration": true,
-    "sourceMap": true,
-    "noEmitOnError": true,
+    "module": "nodenext",
+    "noEmit": true,
     "stripInternal": true,
-    "moduleResolution": "Node16",
+    "moduleResolution": "nodenext",
     "jsx": "react",
     "resolveJsonModule": true,
     "isolatedModules": true,

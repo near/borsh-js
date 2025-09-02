@@ -1,0 +1,59 @@
+{
+  "name": "@dao-xyz/borsh",
+  "version": "5.2.3",
+  "readme": "README.md",
+  "homepage": "https://github.com/dao-xyz/borsh-ts#README",
+  "description": "Binary Object Representation Serializer for Hashing simplified with decorators",
+  "author": "dao.xyz",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "types": "lib/esm/index.d.ts",
+  "exports": {
+    "import": "./lib/esm/index.js",
+    "require": "./lib/cjs/index.js"
+  },
+  "files": [
+    "lib",
+    "src",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "rimraf lib",
+    "build": "yarn clean && tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
+    "postbuild": "echo '{\"type\":\"commonjs\"}' | npx json > lib/cjs/package.json && echo '{\"type\":\"module\"} ' | npx json > lib/esm/package.json && rimraf lib/esm/__tests__  && rimraf lib/cjs/__tests__",
+    "test": "vitest run -c vitest.config.ts",
+    "lint": "eslint src/**/*.ts",
+    "pretty": "prettier --write src/**/*.ts package.json",
+    "pretty:check": "prettier --write src/**/*.ts package.json --check",
+    "fix": "eslint src/**/*.ts --fix"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/node": "^12.7.3",
+    "@types/text-encoding-utf-8": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "eslint": "^6.5.1",
+    "js-sha256": "^0.9.0",
+    "jsfuzz": "^1.0.14",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.3",
+    "benchmark": "^2.1.4",
+    "@types/benchmark": "^2.1.2",
+    "protobufjs": "^7.1.2",
+    "uuid": "^9.0.0",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@protobufjs/utf8": "^1.1.0",
+    "@protobufjs/float": "^1.0.2"
+  }
+}

@@ -1,0 +1,26 @@
+{
+    "name": "@dao-xyz/borsh-rpc",
+    "version": "0.0.0",
+    "description": "Borsh-based RPC over typed messages and decorators",
+    "license": "Apache-2.0",
+    "type": "module",
+    "sideEffects": false,
+    "main": "lib/cjs/index.js",
+    "module": "lib/esm/index.js",
+    "types": "lib/esm/index.d.ts",
+    "files": [
+        "lib"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "clean": "rimraf lib",
+        "build": "yarn clean && tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
+        "postbuild": "echo '{\"type\":\"commonjs\"}' | npx json > lib/cjs/package.json && echo '{\"type\":\"module\"}' | npx json > lib/esm/package.json && rimraf lib/esm/__tests__ && rimraf lib/cjs/__tests__",
+        "test": "vitest run -c vitest.config.ts"
+    },
+    "dependencies": {
+        "@dao-xyz/borsh": "^5.2.3"
+    }
+}

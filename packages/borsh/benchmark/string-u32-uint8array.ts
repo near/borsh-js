@@ -1,4 +1,4 @@
-import { field, serialize, deserialize } from '../src/index.js'
+import { field, serialize, deserialize } from '../src/index.js';
 import B from 'benchmark'
 import protobuf from "protobufjs";
 import crypto from 'crypto';

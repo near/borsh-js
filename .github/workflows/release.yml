@@ -1,21 +1,29 @@
-name: Node.js Package
+name: Release
 on:
   release:
-    types: [created]
+    types: [published]
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
-      - run: yarn install
-      - run: yarn test
-      - run: yarn build
-      - name: Publish
-        run: yarn publish --access=public
+          cache: 'yarn'
+      - name: Install
+        run: yarn install --frozen-lockfile || yarn install
+      - name: Build
+        run: yarn build
+      - name: Test
+        run: yarn workspaces:test
+      - name: Publish packages
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npx lerna publish from-package --yes

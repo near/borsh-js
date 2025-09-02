@@ -1,0 +1,36 @@
+{
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "node_modules",
+        "src/__tests__"
+    ],
+    "compilerOptions": {
+        "lib": [
+            "ES2022",
+            "DOM",
+            "ES2022.Error"
+        ],
+        "rootDir": "src",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitAny": true,
+        "skipLibCheck": true,
+        "target": "ES2020",
+        "moduleResolution": "nodenext",
+        "module": "nodenext",
+        "outDir": "lib/esm",
+        "declaration": true,
+        "sourceMap": true,
+        "noEmitOnError": true,
+        "stripInternal": true,
+        "jsx": "react",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "experimentalDecorators": true,
+        "types": [
+            "node"
+        ]
+    }
+}
