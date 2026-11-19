@@ -9,7 +9,11 @@ export class BorshDeserializer {
     }
 
     decode(schema: Schema): DecodeTypes {
-        return this.decode_value(schema);
+        const value = this.decode_value(schema);
+        if (this.buffer.offset !== this.buffer.buffer_size) {
+            throw new Error(`Unexpected trailing bytes: ${this.buffer.buffer_size - this.buffer.offset}`);
+        }
+        return value;
     }
 
     decode_value(schema: Schema): DecodeTypes {
@@ -55,21 +59,49 @@ export class BorshDeserializer {
         const len: number = this.decode_integer('u32') as number;
         const buffer = new Uint8Array(this.buffer.consume_bytes(len));
 
-        // decode utf-8 string without using TextDecoder
-        // first get all bytes to single byte code points
+        // Decode Unicode scalar values without requiring a TextDecoder implementation.
         const codePoints = [];
         for (let i = 0; i < len; ++i) {
             const byte = buffer[i];
             if (byte < 0x80) {
                 codePoints.push(byte);
-            } else if (byte < 0xE0) {
-                codePoints.push(((byte & 0x1F) << 6) | (buffer[++i] & 0x3F));
-            } else if (byte < 0xF0) {
-                codePoints.push(((byte & 0x0F) << 12) | ((buffer[++i] & 0x3F) << 6) | (buffer[++i] & 0x3F));
-            } else {
-                const codePoint = ((byte & 0x07) << 18) | ((buffer[++i] & 0x3F) << 12) | ((buffer[++i] & 0x3F) << 6) | (buffer[++i] & 0x3F);
-                codePoints.push(codePoint);
+                continue;
             }
+
+            let codePoint: number;
+            let byteLength: number;
+            let minimum: number;
+            if (byte >= 0xC2 && byte <= 0xDF) {
+                codePoint = byte & 0x1F;
+                byteLength = 2;
+                minimum = 0x80;
+            } else if (byte >= 0xE0 && byte <= 0xEF) {
+                codePoint = byte & 0x0F;
+                byteLength = 3;
+                minimum = 0x800;
+            } else if (byte >= 0xF0 && byte <= 0xF4) {
+                codePoint = byte & 0x07;
+                byteLength = 4;
+                minimum = 0x10000;
+            } else {
+                throw new Error('Invalid UTF-8 string');
+            }
+
+            if (i + byteLength > len) {
+                throw new Error('Invalid UTF-8 string');
+            }
+            for (let j = 1; j < byteLength; ++j) {
+                const continuation = buffer[i + j];
+                if ((continuation & 0xC0) !== 0x80) {
+                    throw new Error('Invalid UTF-8 string');
+                }
+                codePoint = (codePoint << 6) | (continuation & 0x3F);
+            }
+            if (codePoint < minimum || codePoint > 0x10FFFF || (codePoint >= 0xD800 && codePoint <= 0xDFFF)) {
+                throw new Error('Invalid UTF-8 string');
+            }
+            codePoints.push(codePoint);
+            i += byteLength - 1;
         }
 
         // then decode code points to utf-8
@@ -77,7 +109,11 @@ export class BorshDeserializer {
     }
 
     decode_boolean(): boolean {
-        return this.buffer.consume_value('u8') > 0;
+        const value = this.buffer.consume_value('u8');
+        if (value > 1) {
+            throw new Error(`Invalid boolean value: ${value}`);
+        }
+        return value === 1;
     }
 
     decode_option(schema: OptionType): DecodeTypes {
@@ -94,7 +130,7 @@ export class BorshDeserializer {
     decode_enum(schema: EnumType): DecodeTypes {
         const valueIndex = this.buffer.consume_value('u8');
 
-        if (valueIndex > schema.enum.length) {
+        if (valueIndex >= schema.enum.length) {
             throw new Error(`Enum option ${valueIndex} is not available`);
         }
 
