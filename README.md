@@ -45,6 +45,8 @@ The package exposes the following functions:
 - `serialize(schema: Schema, obj: any, validate: boolean = true): Uint8Array` - serializes an object `obj` according to the schema `schema`. Setting `validate` to false will skip the validation of the `schema`.
 - `deserialize(schema: Schema, buffer: Uint8Array, validate: boolean = true): any` - deserializes an object according to the schema `schema` from the buffer `buffer`. Setting `validate` to false will skip the validation of the `schema`.
 
+Deserialization rejects malformed value encodings and trailing bytes. If a serialized value is embedded in a larger buffer, pass a slice containing exactly that value. The `validate` flag controls schema validation only.
+
 ## Schemas
 Schemas are used to describe the structure of the data being serialized or deserialized. They are used to
 validate the data and to determine the order of the fields in the serialized data.
